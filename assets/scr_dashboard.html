@@ -170,7 +170,7 @@
 <div class="wrap">
   <header>
     <h1>Painel de crédito nacional — SCR (Banco Central)</h1>
-    <p class="subtitle">Fonte: Sistema de Informações de Crédito (SCR), scrdata_2017.zip a scrdata_2026.zip · dados mensais de estoque · jan/2017 a mai/2026</p>
+    <p class="subtitle">Fonte: Sistema de Informações de Crédito (SCR), scrdata_2017.zip a scrdata_2026.zip · dados mensais de estoque · jan/2017 a <span id="subtitleJanelaMes">mai/2026</span></p>
   </header>
 
   <div class="tabs" id="tabs">
@@ -194,7 +194,7 @@
 
     <div class="kpi-grid">
       <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiGeralCagr">—</p><p class="kpi-sub" id="kpiGeralCagrSub">—</p></div>
-      <div class="kpi-card"><p class="kpi-label">Carteira ativa (mai/2026)</p><p class="kpi-value" id="kpiCarteira">—</p><p class="kpi-sub" id="kpiCarteiraSub">—</p><svg class="kpi-spark" id="kpiCarteiraSpark"></svg></div>
+      <div class="kpi-card"><p class="kpi-label">Carteira ativa (<span id="kpiCarteiraMesLabel">mai/2026</span>)</p><p class="kpi-value" id="kpiCarteira">—</p><p class="kpi-sub" id="kpiCarteiraSub">—</p><svg class="kpi-spark" id="kpiCarteiraSpark"></svg></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiInadimplencia">—</p><p class="kpi-sub" id="kpiInadimplenciaSub">—</p><svg class="kpi-spark" id="kpiInadimplenciaSpark"></svg></div>
       <div class="kpi-card"><p class="kpi-label">Ativo problemático</p><p class="kpi-value" id="kpiAtivoProblematico">—</p><p class="kpi-sub" id="kpiAtivoProblematicoSub">—</p><svg class="kpi-spark" id="kpiAtivoProblematicoSpark"></svg></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiOps">—</p><p class="kpi-sub" id="kpiOpsSub">—</p><svg class="kpi-spark" id="kpiOpsSpark"></svg></div>
@@ -274,13 +274,13 @@
 
     <div class="two-col">
       <section>
-        <h2>Top 10 estados por carteira ativa (mai/2026, R$ bi)</h2>
+        <h2>Top 10 estados por carteira ativa (<span id="tituloTop10UfMes">mai/2026</span>, R$ bi)</h2>
         <div class="chart-box" style="height: 420px;">
           <canvas id="chartUf"></canvas>
         </div>
       </section>
       <section>
-        <h2>Top modalidades por carteira ativa (mai/2026, R$ bi)</h2>
+        <h2>Top modalidades por carteira ativa (<span id="tituloTopModMes">mai/2026</span>, R$ bi)</h2>
         <div class="chart-box" style="height: 420px;">
           <canvas id="chartModalidade"></canvas>
         </div>
@@ -288,7 +288,7 @@
     </div>
 
     <section>
-      <h2>Por tipo de instituição (mai/2026, R$ bi)</h2>
+      <h2>Por tipo de instituição (<span id="tituloTipoInstMes">mai/2026</span>, R$ bi)</h2>
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartSegmento"></canvas>
       </div>
@@ -296,7 +296,7 @@
 
     <div class="two-col">
       <section>
-        <h2>Ranking completo por estado (mai/2026)</h2>
+        <h2>Ranking completo por estado (<span id="tituloRankUfMes">mai/2026</span>)</h2>
         <table>
           <thead>
             <tr id="theadUf">
@@ -310,7 +310,7 @@
         <p style="font-size: 11px; color: var(--text-muted); margin: 8px 0 0;">Clique no cabeçalho de uma coluna para rankear os estados por ela.</p>
       </section>
       <section>
-        <h2>Ranking completo por modalidade (mai/2026)</h2>
+        <h2>Ranking completo por modalidade (<span id="tituloRankModMes">mai/2026</span>)</h2>
         <table>
           <thead><tr><th>Modalidade</th><th class="num">Carteira ativa (R$ mi)</th><th class="num">Inadimplência</th></tr></thead>
           <tbody id="tableModalidade"></tbody>
@@ -376,7 +376,7 @@
   </div>
 
   <div id="tab-consignado" class="tab-panel" style="display:none">
-    <p class="subtitle" style="margin-bottom: 1.5rem;">Submodalidade "Crédito pessoal - com consignação em folha de pagam." · pessoa física · mai/2026</p>
+    <p class="subtitle" style="margin-bottom: 1.5rem;">Submodalidade "Crédito pessoal - com consignação em folha de pagam." · pessoa física · <span id="subtitleConsignadoMes">mai/2026</span></p>
 
     <div class="filters" id="viewConsignado" style="margin-bottom: 1.25rem;">
       <button class="filter-btn active" data-view="scr">Estoque no SCR</button>
@@ -385,7 +385,7 @@
 
     <div id="consignadoViewScr">
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiConsigCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiConsigCagr">—</p><p class="kpi-sub" id="kpiConsigCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total consignado</p><p class="kpi-value" id="kpiConsigTotal">—</p><p class="kpi-sub" id="kpiConsigTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiConsigOps">—</p><p class="kpi-sub" id="kpiConsigOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiConsigInad">—</p><p class="kpi-sub" id="kpiConsigInadSub">—</p></div>
@@ -457,7 +457,7 @@
     </section>
 
     <section>
-      <h2>Estoque de consignado por tipo de tomador (mai/2026)</h2>
+      <h2>Estoque de consignado por tipo de tomador (<span id="tituloConsigTomadorMes">mai/2026</span>)</h2>
       <table>
         <thead>
           <tr><th>Tipo</th><th class="num">Operações</th><th class="num">Estoque (R$ mi)</th><th style="width:160px;">% do total</th><th class="num">Inadimplência</th></tr>
@@ -658,7 +658,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Cartão de crédito — rotativo, parcelado e antecipação de fatura · pessoa física</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiCartaoCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiCartaoCagr">—</p><p class="kpi-sub" id="kpiCartaoCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiCartaoTotal">—</p><p class="kpi-sub" id="kpiCartaoTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiCartaoOps">—</p><p class="kpi-sub" id="kpiCartaoOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiCartaoInad">—</p><p class="kpi-sub" id="kpiCartaoInadSub">—</p></div>
@@ -712,7 +712,7 @@
     </section>
 
     <section>
-      <h2>Estoque por tipo de operação (mai/2026)</h2>
+      <h2>Estoque por tipo de operação (<span id="tituloCartaoTipoOpMes">mai/2026</span>)</h2>
       <table>
         <thead>
           <tr><th>Tipo</th><th class="num">Operações</th><th class="num">Estoque (R$ mi)</th><th style="width:160px;">% do total</th><th class="num">Inadimplência</th></tr>
@@ -802,7 +802,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Crédito pessoal sem consignação + cheque especial · pessoa física</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiPessoalCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiPessoalCagr">—</p><p class="kpi-sub" id="kpiPessoalCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiPessoalTotal">—</p><p class="kpi-sub" id="kpiPessoalTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiPessoalOps">—</p><p class="kpi-sub" id="kpiPessoalOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiPessoalInad">—</p><p class="kpi-sub" id="kpiPessoalInadSub">—</p></div>
@@ -860,7 +860,7 @@
     </section>
 
     <section>
-      <h2>Estoque por tipo de operação (mai/2026)</h2>
+      <h2>Estoque por tipo de operação (<span id="tituloPessoalTipoOpMes">mai/2026</span>)</h2>
       <table>
         <thead>
           <tr><th>Tipo</th><th class="num">Operações</th><th class="num">Estoque (R$ mi)</th><th style="width:160px;">% do total</th><th class="num">Inadimplência</th></tr>
@@ -919,7 +919,7 @@
 
     <div id="veiculosViewScr">
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiVeicCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiVeicCagr">—</p><p class="kpi-sub" id="kpiVeicCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiVeicTotal">—</p><p class="kpi-sub" id="kpiVeicTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiVeicOps">—</p><p class="kpi-sub" id="kpiVeicOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiVeicInad">—</p><p class="kpi-sub" id="kpiVeicInadSub">—</p></div>
@@ -1145,7 +1145,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Financiamento habitacional — SFH (regulado) + fora do SFH (taxas de mercado) · pessoa física · a maior modalidade de crédito do SCR</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiHabitCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiHabitCagr">—</p><p class="kpi-sub" id="kpiHabitCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiHabitTotal">—</p><p class="kpi-sub" id="kpiHabitTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiHabitOps">—</p><p class="kpi-sub" id="kpiHabitOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiHabitInad">—</p><p class="kpi-sub" id="kpiHabitInadSub">—</p></div>
@@ -1207,7 +1207,7 @@
     </section>
 
     <section>
-      <h2>Estoque por tipo de financiamento (mai/2026)</h2>
+      <h2>Estoque por tipo de financiamento (<span id="tituloHabitTipoFinMes">mai/2026</span>)</h2>
       <table>
         <thead>
           <tr><th>Tipo</th><th class="num">Operações</th><th class="num">Estoque (R$ mi)</th><th style="width:160px;">% do total</th><th class="num">Inadimplência</th></tr>
@@ -1271,7 +1271,7 @@
     </div>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiRuralCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiRuralCagr">—</p><p class="kpi-sub" id="kpiRuralCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiRuralTotal">—</p><p class="kpi-sub" id="kpiRuralTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiRuralOps">—</p><p class="kpi-sub" id="kpiRuralOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiRuralInad">—</p><p class="kpi-sub" id="kpiRuralInadSub">—</p></div>
@@ -1393,7 +1393,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Crédito para pessoa jurídica de <strong>grande porte</strong> — financiamentos, empréstimos, comércio exterior e rural. Classificação de porte é a reportada pela própria instituição financeira ao SCR, seguindo a definição do BC: <strong>grande empresa</strong> = receita bruta anual acima de R$ 300 milhões <em>ou</em> ativo total acima de R$ 240 milhões. Compare com a aba MPME para ver o contraste de acesso a crédito e inadimplência entre grandes empresas e micro/pequenas/médias.</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiGrandeCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiGrandeCagr">—</p><p class="kpi-sub" id="kpiGrandeCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiGrandeTotal">—</p><p class="kpi-sub" id="kpiGrandeTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiGrandeOps">—</p><p class="kpi-sub" id="kpiGrandeOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiGrandeInad">—</p><p class="kpi-sub" id="kpiGrandeInadSub">—</p></div>
@@ -1462,7 +1462,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Crédito para pessoa jurídica de <strong>micro, pequeno e médio porte (MPME)</strong> — financiamentos, empréstimos, comércio exterior e rural. Compare com a aba Grandes empresas para ver o contraste de acesso a crédito e inadimplência.</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiMpmeCagr">—</p><p class="kpi-sub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiMpmeCagr">—</p><p class="kpi-sub" id="kpiMpmeCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiMpmeTotal">—</p><p class="kpi-sub" id="kpiMpmeTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiMpmeOps">—</p><p class="kpi-sub" id="kpiMpmeOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiMpmeInad">—</p><p class="kpi-sub" id="kpiMpmeInadSub">—</p></div>
@@ -2132,6 +2132,12 @@ function render() {
   document.getElementById('kpiGeralCagr').textContent = geralCagr == null ? '—' : fmtPct(geralCagr);
   document.getElementById('kpiGeralCagrSub').textContent = `${mesLabels[0]}–${mesLabels[mesLabels.length - 1]}`;
 
+  const mesMaisRecenteGeral = mesLabels[mesLabels.length - 1];
+  ['subtitleJanelaMes', 'kpiCarteiraMesLabel', 'tituloTop10UfMes', 'tituloTopModMes', 'tituloTipoInstMes', 'tituloRankUfMes', 'tituloRankModMes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = mesMaisRecenteGeral;
+  });
+
   document.getElementById('kpiCarteira').textContent = fmtBRLcompact(caLatest);
   if (yoyKey) {
     const [, caYoy] = sumCliente(DATA.month_cliente[yoyKey], activeCliente);
@@ -2532,8 +2538,14 @@ function renderCagrCards() {
   Object.entries(CAGR_CARD_MAP).forEach(([id, segmento]) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const cagr = computeCagr(DATA_SEVERIDADE.segmentos[segmento].by_month);
+    const byMonth = DATA_SEVERIDADE.segmentos[segmento].by_month;
+    const cagr = computeCagr(byMonth);
     el.textContent = cagr == null ? '—' : fmtPct(cagr);
+    const subEl = document.getElementById(id + 'Sub');
+    if (subEl) {
+      const keys = Object.keys(byMonth).sort();
+      if (keys.length) subEl.textContent = mesLabel(keys[0]) + '–' + mesLabel(keys[keys.length - 1]);
+    }
   });
 }
 
@@ -2575,6 +2587,9 @@ function renderConsignado() {
   document.getElementById('kpiConsigInadSub').textContent = mesLabel(latest);
   document.getElementById('kpiConsigTicket').textContent = totalN > 0 ? fmtBRL(totalCa / totalN) : '—';
   document.getElementById('kpiConsigTicketSub').textContent = mesLabel(latest);
+  document.getElementById('subtitleConsignadoMes').textContent = mesLabel(latest);
+  document.getElementById('tituloConsigTomadorMes').textContent = mesLabel(latest);
+  document.getElementById('kpiConsigCagrSub').textContent = 'jan/2017–' + mesLabel(latest);
 
   const sorted = Object.entries(rows).sort((a, b) => b[1][1] - a[1][1]);
 
@@ -2950,6 +2965,8 @@ function renderCartao() {
 
   const cagr = computeCagrBuckets(bucketNames);
   document.getElementById('kpiCartaoCagr').textContent = cagr == null ? '—' : fmtPct(cagr);
+  document.getElementById('kpiCartaoCagrSub').textContent = 'jan/2017–' + mesLabel(latest);
+  document.getElementById('tituloCartaoTipoOpMes').textContent = mesLabel(latest);
   document.getElementById('kpiCartaoTotal').textContent = fmtBRLcompact(totalCa);
   document.getElementById('kpiCartaoTotalSub').textContent = mesLabel(latest);
   document.getElementById('kpiCartaoOps').textContent = fmtNum(totalN);
@@ -3121,6 +3138,8 @@ function renderPessoal() {
 
   const cagr = computeCagrBuckets(bucketNames);
   document.getElementById('kpiPessoalCagr').textContent = cagr == null ? '—' : fmtPct(cagr);
+  document.getElementById('kpiPessoalCagrSub').textContent = 'jan/2017–' + mesLabel(latest);
+  document.getElementById('tituloPessoalTipoOpMes').textContent = mesLabel(latest);
   document.getElementById('kpiPessoalTotal').textContent = fmtBRLcompact(totalCa);
   document.getElementById('kpiPessoalTotalSub').textContent = mesLabel(latest);
   document.getElementById('kpiPessoalOps').textContent = fmtNum(totalN);
@@ -3726,6 +3745,7 @@ function renderHabitacional() {
 
   document.getElementById('kpiHabitTotal').textContent = fmtBRLcompact(totalCa);
   document.getElementById('kpiHabitTotalSub').textContent = mesLabel(latest);
+  document.getElementById('tituloHabitTipoFinMes').textContent = mesLabel(latest);
   document.getElementById('kpiHabitOps').textContent = fmtNum(totalN);
   document.getElementById('kpiHabitOpsSub').textContent = mesLabel(latest);
   document.getElementById('kpiHabitInad').textContent = totalCa > 0 ? fmtPct(totalCi / totalCa * 100) : '—';
