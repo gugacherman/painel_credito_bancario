@@ -193,9 +193,9 @@
     </div>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiGeralCagr">—</p><p class="kpi-sub" id="kpiGeralCagrSub">—</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiGeralCagr">—</p><p class="kpi-sub" id="kpiGeralCagrSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Carteira ativa (<span id="kpiCarteiraMesLabel">mai/2026</span>)</p><p class="kpi-value" id="kpiCarteira">—</p><p class="kpi-sub" id="kpiCarteiraSub">—</p><svg class="kpi-spark" id="kpiCarteiraSpark"></svg></div>
-      <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiInadimplencia">—</p><p class="kpi-sub" id="kpiInadimplenciaSub">—</p><svg class="kpi-spark" id="kpiInadimplenciaSpark"></svg></div>
+      <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiInadimplencia">—</p><p class="kpi-sub" id="kpiInadimplenciaSub">—</p><p class="kpi-sub" id="kpiInadimplenciaDeltaMoM">—</p><svg class="kpi-spark" id="kpiInadimplenciaSpark"></svg></div>
       <div class="kpi-card"><p class="kpi-label">Ativo problemático</p><p class="kpi-value" id="kpiAtivoProblematico">—</p><p class="kpi-sub" id="kpiAtivoProblematicoSub">—</p><svg class="kpi-spark" id="kpiAtivoProblematicoSpark"></svg></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiOps">—</p><p class="kpi-sub" id="kpiOpsSub">—</p><svg class="kpi-spark" id="kpiOpsSpark"></svg></div>
     </div>
@@ -212,7 +212,7 @@
             <tr>
               <th>Segmento</th>
               <th>Carteira ativa</th>
-              <th class="num">Cresc. M/M</th>
+              <th class="num">Cresc. YoY</th>
               <th class="num">Inadimplência</th>
               <th>Tendência (12m)</th>
               <th class="num">Δ inadimplência M/M</th>
@@ -221,7 +221,7 @@
           <tbody id="tableScorecard"></tbody>
         </table>
       </div>
-      <p class="caveat"><strong>SCR + SGS:</strong> Carteira ativa e crescimento: <code>carteira_ativa</code> somada dentro de cada segmento (mesma base das abas individuais). Inadimplência: <code>carteira_inadimplencia / carteira_ativa</code>, mês mais recente vs. 12 meses atrás. A cor da coluna Δ é sobre <strong>direção</strong> (piorando/melhorando), não sobre o nível absoluto — segmentos de natureza diferente (ex.: cartão rotativo vs. financiamento habitacional) têm patamares de inadimplência estruturalmente diferentes, então comparar níveis brutos entre eles não é informativo; a variação recente é. Rural soma pessoa física + jurídica; os demais seguem a mesma composição das respectivas abas. Consignado, Cartão, Crédito pessoal, Veículos, Habitacional e a parte PF de Rural usam a série oficial do SGS quando disponível (mesma regra das abas individuais); Grandes empresas, MPME e a parte PJ de Rural continuam via SCR.</p>
+      <p class="caveat"><strong>SCR + SGS:</strong> Carteira ativa: <code>carteira_ativa</code> somada dentro de cada segmento (mesma base das abas individuais). Cresc. = variação YoY (mês mais recente vs. mesmo mês 12 meses atrás, considera sazonalidade). Δ inadimplência = variação mês a mês (mês mais recente vs. mês imediatamente anterior, sinal de curto prazo). A cor da coluna Δ é sobre <strong>direção</strong> (piorando/melhorando), não sobre o nível absoluto — segmentos de natureza diferente (ex.: cartão rotativo vs. financiamento habitacional) têm patamares de inadimplência estruturalmente diferentes, então comparar níveis brutos entre eles não é informativo; a variação recente é. Rural soma pessoa física + jurídica; os demais seguem a mesma composição das respectivas abas. Consignado, Cartão, Crédito pessoal, Veículos, Habitacional e a parte PF de Rural usam a série oficial do SGS quando disponível (mesma regra das abas individuais); Grandes empresas, MPME e a parte PJ de Rural continuam via SCR.</p>
     </section>
 
     <section>
@@ -382,7 +382,7 @@
 
     <div id="consignadoViewScr">
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiConsigCagr">—</p><p class="kpi-sub" id="kpiConsigCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiConsigCagr">—</p><p class="kpi-sub" id="kpiConsigCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total consignado</p><p class="kpi-value" id="kpiConsigTotal">—</p><p class="kpi-sub" id="kpiConsigTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiConsigOps">—</p><p class="kpi-sub" id="kpiConsigOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiConsigInad">—</p><p class="kpi-sub" id="kpiConsigInadSub">—</p></div>
@@ -393,9 +393,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresConsignado">Crescimento mês a mês por tipo de consignado (%)</h2>
         <div class="filters" id="periodoCres" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -651,7 +651,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Cartão de crédito — rotativo, parcelado e antecipação de fatura · pessoa física</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiCartaoCagr">—</p><p class="kpi-sub" id="kpiCartaoCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiCartaoCagr">—</p><p class="kpi-sub" id="kpiCartaoCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiCartaoTotal">—</p><p class="kpi-sub" id="kpiCartaoTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiCartaoOps">—</p><p class="kpi-sub" id="kpiCartaoOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiCartaoInad">—</p><p class="kpi-sub" id="kpiCartaoInadSub">—</p></div>
@@ -662,9 +662,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresCartao">Crescimento mês a mês por tipo (%)</h2>
         <div class="filters" id="periodoCresCartao" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -794,7 +794,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Crédito pessoal sem consignação + cheque especial · pessoa física</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiPessoalCagr">—</p><p class="kpi-sub" id="kpiPessoalCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiPessoalCagr">—</p><p class="kpi-sub" id="kpiPessoalCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiPessoalTotal">—</p><p class="kpi-sub" id="kpiPessoalTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiPessoalOps">—</p><p class="kpi-sub" id="kpiPessoalOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiPessoalInad">—</p><p class="kpi-sub" id="kpiPessoalInadSub">—</p></div>
@@ -805,9 +805,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresPessoal">Crescimento mês a mês por tipo (%)</h2>
         <div class="filters" id="periodoCresPessoal" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -910,7 +910,7 @@
 
     <div id="veiculosViewScr">
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiVeicCagr">—</p><p class="kpi-sub" id="kpiVeicCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiVeicCagr">—</p><p class="kpi-sub" id="kpiVeicCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiVeicTotal">—</p><p class="kpi-sub" id="kpiVeicTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiVeicOps">—</p><p class="kpi-sub" id="kpiVeicOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiVeicInad">—</p><p class="kpi-sub" id="kpiVeicInadSub">—</p></div>
@@ -921,9 +921,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresVeiculos">Crescimento mês a mês (%)</h2>
         <div class="filters" id="periodoCresVeiculos" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <div class="chart-box" style="height: 300px;">
@@ -1134,7 +1134,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Financiamento habitacional — SFH (regulado) + fora do SFH (taxas de mercado) · pessoa física · a maior modalidade de crédito do SCR</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiHabitCagr">—</p><p class="kpi-sub" id="kpiHabitCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiHabitCagr">—</p><p class="kpi-sub" id="kpiHabitCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiHabitTotal">—</p><p class="kpi-sub" id="kpiHabitTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiHabitOps">—</p><p class="kpi-sub" id="kpiHabitOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiHabitInad">—</p><p class="kpi-sub" id="kpiHabitInadSub">—</p></div>
@@ -1145,9 +1145,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresHabitacional">Crescimento mês a mês por tipo (%)</h2>
         <div class="filters" id="periodoCresHabitacional" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -1259,7 +1259,7 @@
     </div>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiRuralCagr">—</p><p class="kpi-sub" id="kpiRuralCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiRuralCagr">—</p><p class="kpi-sub" id="kpiRuralCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiRuralTotal">—</p><p class="kpi-sub" id="kpiRuralTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiRuralOps">—</p><p class="kpi-sub" id="kpiRuralOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiRuralInad">—</p><p class="kpi-sub" id="kpiRuralInadSub">—</p></div>
@@ -1271,9 +1271,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresRural">Crescimento mês a mês por tipo (%)</h2>
         <div class="filters" id="periodoCresRural" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -1381,7 +1381,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Crédito para pessoa jurídica de <strong>grande porte</strong> — financiamentos, empréstimos, comércio exterior e rural. Classificação de porte é a reportada pela própria instituição financeira ao SCR, seguindo a definição do BC: <strong>grande empresa</strong> = receita bruta anual acima de R$ 300 milhões <em>ou</em> ativo total acima de R$ 240 milhões. Compare com a aba MPME para ver o contraste de acesso a crédito e inadimplência entre grandes empresas e micro/pequenas/médias.</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiGrandeCagr">—</p><p class="kpi-sub" id="kpiGrandeCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiGrandeCagr">—</p><p class="kpi-sub" id="kpiGrandeCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiGrandeTotal">—</p><p class="kpi-sub" id="kpiGrandeTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiGrandeOps">—</p><p class="kpi-sub" id="kpiGrandeOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiGrandeInad">—</p><p class="kpi-sub" id="kpiGrandeInadSub">—</p></div>
@@ -1392,9 +1392,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresGrande">Crescimento mês a mês por tipo (%)</h2>
         <div class="filters" id="periodoCresGrande" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -1449,7 +1449,7 @@
     <p class="subtitle" style="margin-bottom: 1.5rem;">Crédito para pessoa jurídica de <strong>micro, pequeno e médio porte (MPME)</strong> — financiamentos, empréstimos, comércio exterior e rural. Compare com a aba Grandes empresas para ver o contraste de acesso a crédito e inadimplência.</p>
 
     <div class="kpi-grid">
-      <div class="kpi-card"><p class="kpi-label">CAGR desde 2017</p><p class="kpi-value" id="kpiMpmeCagr">—</p><p class="kpi-sub" id="kpiMpmeCagrSub">jan/2017–mai/2026</p></div>
+      <div class="kpi-card"><p class="kpi-label">Crescimento YoY</p><p class="kpi-value" id="kpiMpmeCagr">—</p><p class="kpi-sub" id="kpiMpmeCagrSub">jan/2017–mai/2026</p></div>
       <div class="kpi-card"><p class="kpi-label">Estoque total</p><p class="kpi-value" id="kpiMpmeTotal">—</p><p class="kpi-sub" id="kpiMpmeTotalSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Operações registradas</p><p class="kpi-value" id="kpiMpmeOps">—</p><p class="kpi-sub" id="kpiMpmeOpsSub">—</p></div>
       <div class="kpi-card"><p class="kpi-label">Taxa de inadimplência</p><p class="kpi-value" id="kpiMpmeInad">—</p><p class="kpi-sub" id="kpiMpmeInadSub">—</p></div>
@@ -1460,9 +1460,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
         <h2 style="margin:0;" id="tituloCresMpme">Crescimento mês a mês por tipo (%)</h2>
         <div class="filters" id="periodoCresMpme" style="margin: 0;">
-          <button class="filter-btn active" data-modo="estoque">Estoque</button>
+          <button class="filter-btn" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn" data-modo="cagr">YoY</button>
+          <button class="filter-btn active" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -2130,15 +2130,15 @@ function render() {
   const yoyKey = mesKeys[mesKeys.length - 13] || null;
   const [nLatest, caLatest, cvLatest, ciLatest, apLatest] = sumCliente(DATA.month_cliente[latestKey], activeCliente);
 
-  const geralFirstCa = carteiraRaw[0];
+  // YoY do período vigente (mês mais recente vs. mesmo mês 12 meses atrás), não mais CAGR desde 2017.
+  const geralYoy12Ca = mesKeys.length >= 13 ? carteiraRaw[mesKeys.length - 13] : null;
   const geralLastCa = carteiraRaw[carteiraRaw.length - 1];
   let geralCagr = null;
-  if (geralFirstCa > 0 && geralLastCa > 0) {
-    const years = (new Date(mesKeys[mesKeys.length - 1]) - new Date(mesKeys[0])) / (1000 * 60 * 60 * 24 * 365.25);
-    if (years > 0) geralCagr = (Math.pow(geralLastCa / geralFirstCa, 1 / years) - 1) * 100;
+  if (geralYoy12Ca > 0 && geralLastCa > 0) {
+    geralCagr = (geralLastCa / geralYoy12Ca - 1) * 100;
   }
   document.getElementById('kpiGeralCagr').textContent = geralCagr == null ? '—' : fmtPct(geralCagr);
-  document.getElementById('kpiGeralCagrSub').textContent = `${mesLabels[0]}–${mesLabels[mesLabels.length - 1]}` + (carteiraUsaSgs ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiGeralCagrSub').textContent = (mesKeys.length >= 13 ? `${mesLabels[mesLabels.length - 13]}–${mesLabels[mesLabels.length - 1]}` : '—') + (carteiraUsaSgs ? ' · SGS' : ' · SCR');
 
   const mesMaisRecenteGeral = mesLabels[mesLabels.length - 1];
   ['subtitleJanelaMes', 'kpiCarteiraMesLabel', 'tituloTop10UfMes', 'tituloTopModMes', 'tituloTipoInstMes', 'tituloRankUfMes', 'tituloRankModMes', 'tituloRankingsMes'].forEach(id => {
@@ -2157,6 +2157,19 @@ function render() {
   const inadSgsLatest = sgsSerieGeral ? sgsInadValue(sgsSerieGeral, latestKey) : null;
   document.getElementById('kpiInadimplencia').textContent = inadSgsLatest != null ? fmtPct(inadSgsLatest) : (caLatest > 0 ? fmtPct(ciLatest / caLatest * 100) : '—');
   document.getElementById('kpiInadimplenciaSub').textContent = mesLabel(latestKey) + (inadSgsLatest != null ? ' · SGS' : ' · SCR');
+  const inadAtual = inadSgsLatest != null ? inadSgsLatest : (caLatest > 0 ? ciLatest / caLatest * 100 : null);
+  const prevKey = mesKeys[mesKeys.length - 2] || null;
+  let inadPrev = null;
+  if (prevKey) {
+    if (sgsSerieGeral) {
+      inadPrev = sgsInadValue(sgsSerieGeral, prevKey);
+    } else {
+      const [, caPrev, , ciPrev] = sumCliente(DATA.month_cliente[prevKey], activeCliente);
+      inadPrev = caPrev > 0 ? ciPrev / caPrev * 100 : null;
+    }
+  }
+  const deltaInadMoM = (inadAtual != null && inadPrev != null) ? inadAtual - inadPrev : null;
+  document.getElementById('kpiInadimplenciaDeltaMoM').innerHTML = deltaInadMoM == null ? '—' : scorecardDeltaPill(deltaInadMoM) + ' vs. mês anterior';
   document.getElementById('kpiAtivoProblematico').textContent = caLatest > 0 ? fmtPct(apLatest / caLatest * 100) : '—';
   document.getElementById('kpiAtivoProblematicoSub').textContent = mesLabel(latestKey);
   document.getElementById('kpiOps').textContent = fmtNum(nLatest);
@@ -2542,17 +2555,44 @@ function renderSeveridadeSegmentos() {
   }
 }
 
-function computeCagr(byMonth) {
+function computeCagr(byMonth, sgsKey) {
+  // Apesar do nome (mantido por compatibilidade), calcula YoY simples do período
+  // vigente (mês mais recente vs. mesmo mês 12 meses atrás), não mais CAGR desde 2017.
+  // Usa SGS quando sgsKey cobrir os dois meses (mesmo mês/mesmo ano-atras); senão, SCR.
   const keys = Object.keys(byMonth).sort();
-  if (keys.length < 2) return null;
-  const firstKey = keys[0];
+  const idx12 = keys.length - 13;
+  if (idx12 < 0) return null;
+  const firstKey = keys[idx12];
   const lastKey = keys[keys.length - 1];
-  const first = byMonth[firstKey][2];
-  const last = byMonth[lastKey][2];
+  const sgsFirst = sgsKey ? sgsSaldoValue(sgsKey, firstKey) : null;
+  const sgsLast = sgsKey ? sgsSaldoValue(sgsKey, lastKey) : null;
+  let first, last, usaSgs;
+  if (sgsFirst != null && sgsLast != null) {
+    first = sgsFirst; last = sgsLast; usaSgs = true;
+  } else {
+    first = byMonth[firstKey][2]; last = byMonth[lastKey][2]; usaSgs = false;
+  }
   if (!(first > 0) || !(last > 0)) return null;
-  const years = (new Date(lastKey) - new Date(firstKey)) / (1000 * 60 * 60 * 24 * 365.25);
-  if (years <= 0) return null;
-  return (Math.pow(last / first, 1 / years) - 1) * 100;
+  return { value: (last / first - 1) * 100, usaSgs };
+}
+
+// Rural (PF + PJ): PF tenta SGS (rural_pf_total), PJ sempre SCR (sem serie SGS viva) --
+// mesma logica da SEGMENTOS_SCORECARD/chartEvolucaoSegmentos, aplicada ao YoY do card.
+function computeCagrRural() {
+  const keysPf = Object.keys(DATA_RURAL.by_month_bucket).sort();
+  const idx12 = keysPf.length - 13;
+  if (idx12 < 0) return null;
+  const key12 = keysPf[idx12], latest = keysPf[keysPf.length - 1];
+  function totalAt(k) {
+    const pfSgs = sgsSaldoValue('rural_pf_total', k);
+    const pf = pfSgs != null ? pfSgs : genericMonthTotal(DATA_RURAL.by_month_bucket, k);
+    const pj = genericMonthTotal(DATA_RURAL_PJ.by_month_bucket, k);
+    if (pf == null && pj == null) return null;
+    return { total: (pf || 0) + (pj || 0), usaSgs: pfSgs != null };
+  }
+  const a = totalAt(key12), b = totalAt(latest);
+  if (!a || !b || !(a.total > 0) || !(b.total > 0)) return null;
+  return { value: (b.total / a.total - 1) * 100, usaSgs: a.usaSgs && b.usaSgs };
 }
 
 // mapeia o id do kpi-card de cada aba para o nome do segmento em DATA_SEVERIDADE.segmentos
@@ -2564,18 +2604,26 @@ const CAGR_CARD_MAP = {
   kpiGrandeCagr: 'Grandes empresas',
   kpiMpmeCagr: 'MPME',
 };
+// Serie SGS de saldo equivalente a cada card (Grande/MPME ficam de fora -- sem serie
+// SGS por porte viva; Rural tratado a parte, mistura PF-SGS + PJ-SCR).
+const CAGR_CARD_SGS_KEY = {
+  kpiConsigCagr: 'consignado_total',
+  kpiVeicCagr: 'veiculos_pf',
+  kpiHabitCagr: 'habitacional_total_pf',
+};
 
 function renderCagrCards() {
   Object.entries(CAGR_CARD_MAP).forEach(([id, segmento]) => {
     const el = document.getElementById(id);
     if (!el) return;
     const byMonth = DATA_SEVERIDADE.segmentos[segmento].by_month;
-    const cagr = computeCagr(byMonth);
-    el.textContent = cagr == null ? '—' : fmtPct(cagr);
+    const result = segmento === 'Rural (PF + PJ)' ? computeCagrRural() : computeCagr(byMonth, CAGR_CARD_SGS_KEY[id]);
+    el.textContent = result == null ? '—' : fmtPct(result.value);
     const subEl = document.getElementById(id + 'Sub');
     if (subEl) {
       const keys = Object.keys(byMonth).sort();
-      if (keys.length) subEl.textContent = mesLabel(keys[0]) + '–' + mesLabel(keys[keys.length - 1]);
+      const idx12 = keys.length - 13;
+      if (idx12 >= 0) subEl.textContent = mesLabel(keys[idx12]) + '–' + mesLabel(keys[keys.length - 1]) + (result ? (result.usaSgs ? ' · SGS' : ' · SCR') : '');
     }
   });
 }
@@ -2636,7 +2684,6 @@ function renderConsignado() {
   document.getElementById('kpiConsigTicketSub').textContent = mesLabel(latest);
   document.getElementById('subtitleConsignadoMes').textContent = mesLabel(latest);
   document.getElementById('tituloConsigTomadorMes').textContent = mesLabel(latest);
-  document.getElementById('kpiConsigCagrSub').textContent = 'jan/2017–' + mesLabel(latest);
 
   const sorted = Object.entries(rows).sort((a, b) => b[1][1] - a[1][1]);
 
@@ -2663,7 +2710,7 @@ function renderConsignado() {
   renderInadConsignado();
 }
 
-let activoModoCres = 'estoque';
+let activoModoCres = 'cagr';
 function renderCresConsignado() {
   const mesKeysC = Object.keys(DATA_CONSIGNADO.by_month_ocupacao).sort();
   const mesLabelsC = mesKeysC.map(mesLabel);
@@ -2975,16 +3022,19 @@ function renderScorecard() {
     const latest = keys[keys.length - 1];
     const idx1 = keys.length - 2;
     const key1 = idx1 >= 0 ? keys[idx1] : null;
+    const idx12 = keys.length - 13;
+    const key12 = idx12 >= 0 ? keys[idx12] : null;
 
     const totLatest = seg.getTotals(byMonth, latest);
     const tot1 = key1 ? seg.getTotals(byMonth, key1) : null;
+    const tot12 = key12 ? seg.getTotals(byMonth, key12) : null;
 
     const caLatest = totLatest ? totLatest.ca : 0;
     const inadLatest = totLatest && totLatest.ca > 0 ? totLatest.ci / totLatest.ca * 100 : null;
     const inad1 = tot1 && tot1.ca > 0 ? tot1.ci / tot1.ca * 100 : null;
-    // Cresc. e Delta inadimplencia mes/mes (nao mais 12m) -- compara o mes mais recente
-    // contra o mes imediatamente anterior, a pedido do usuario.
-    const cresc12 = tot1 && tot1.ca > 0 ? (totLatest.ca - tot1.ca) / tot1.ca * 100 : null;
+    // Cresc. = YoY (12m, considera sazonalidade); Delta inadimplencia = mes/mes (sinal de
+    // curto prazo) -- volta ao YoY pra crescimento a pedido do usuario.
+    const cresc12 = tot12 && tot12.ca > 0 ? (totLatest.ca - tot12.ca) / tot12.ca * 100 : null;
     const deltaInad = (inadLatest != null && inad1 != null) ? inadLatest - inad1 : null;
 
     const trend = keys.slice(-12).map(k => {
@@ -3033,21 +3083,29 @@ document.getElementById('tableScorecard').addEventListener('click', (e) => {
   if (btn) btn.click();
 });
 
-function computeCagrBuckets(bucketNames) {
+function computeCagrBuckets(bucketNames, sgsSaldoKeys) {
+  // Idem computeCagr: nome mantido, mas calcula YoY do período vigente, não CAGR desde 2017.
+  // Usa a soma das series SGS em sgsSaldoKeys quando cobrirem os dois meses; senão, SCR.
   const keys = Object.keys(DATA_RISCO.by_month_bucket).sort();
-  if (keys.length < 2) return null;
+  const idx12 = keys.length - 13;
+  if (idx12 < 0) return null;
+  const key12 = keys[idx12], latest = keys[keys.length - 1];
   const sumCa = (k) => {
     const row = DATA_RISCO.by_month_bucket[k];
     let s = 0;
     for (const b of bucketNames) { if (row && row[b]) s += row[b][1]; }
     return s;
   };
-  const first = sumCa(keys[0]);
-  const last = sumCa(keys[keys.length - 1]);
+  const sgsFirst = sgsSaldoKeys ? sgsSaldoSum(sgsSaldoKeys, key12) : null;
+  const sgsLast = sgsSaldoKeys ? sgsSaldoSum(sgsSaldoKeys, latest) : null;
+  let first, last, usaSgs;
+  if (sgsFirst != null && sgsLast != null) {
+    first = sgsFirst; last = sgsLast; usaSgs = true;
+  } else {
+    first = sumCa(key12); last = sumCa(latest); usaSgs = false;
+  }
   if (!(first > 0) || !(last > 0)) return null;
-  const years = (new Date(keys[keys.length - 1]) - new Date(keys[0])) / (1000 * 60 * 60 * 24 * 365.25);
-  if (years <= 0) return null;
-  return (Math.pow(last / first, 1 / years) - 1) * 100;
+  return { value: (last / first - 1) * 100, usaSgs };
 }
 
 function renderCartao() {
@@ -3059,9 +3117,11 @@ function renderCartao() {
   for (const b of bucketNames) { if (rows[b]) for (let i = 0; i < 5; i++) total[i] += rows[b][i]; }
   const [totalN, totalCa, totalCv, totalCi, totalAp] = total;
 
-  const cagr = computeCagrBuckets(bucketNames);
-  document.getElementById('kpiCartaoCagr').textContent = cagr == null ? '—' : fmtPct(cagr);
-  document.getElementById('kpiCartaoCagrSub').textContent = 'jan/2017–' + mesLabel(latest);
+  const cagr = computeCagrBuckets(bucketNames, ['cartao_total_pf']);
+  document.getElementById('kpiCartaoCagr').textContent = cagr == null ? '—' : fmtPct(cagr.value);
+  const keysCartaoCagr = Object.keys(DATA_RISCO.by_month_bucket).sort();
+  const idx12CartaoCagr = keysCartaoCagr.length - 13;
+  document.getElementById('kpiCartaoCagrSub').textContent = (idx12CartaoCagr >= 0 ? mesLabel(keysCartaoCagr[idx12CartaoCagr]) + '–' + mesLabel(latest) : '—') + (cagr ? (cagr.usaSgs ? ' · SGS' : ' · SCR') : '');
   document.getElementById('tituloCartaoTipoOpMes').textContent = mesLabel(latest);
   const cartaoSaldoSgs = sgsSaldoValue('cartao_total_pf', latest);
   const cartaoInadSgs = sgsInadValue('cartao_total_pf', latest);
@@ -3154,7 +3214,7 @@ function renderInadCartao() {
 }
 
 let chartCresCartao;
-let activoModoCresCartao = 'estoque';
+let activoModoCresCartao = 'cagr';
 function renderCresCartao() {
   const mesKeysR = Object.keys(DATA_RISCO.by_month_bucket).sort();
   const mesLabelsR = mesKeysR.map(mesLabel);
@@ -3238,9 +3298,11 @@ function renderPessoal() {
   for (const b of bucketNames) { if (rows[b]) for (let i = 0; i < 5; i++) total[i] += rows[b][i]; }
   const [totalN, totalCa, totalCv, totalCi, totalAp] = total;
 
-  const cagr = computeCagrBuckets(bucketNames);
-  document.getElementById('kpiPessoalCagr').textContent = cagr == null ? '—' : fmtPct(cagr);
-  document.getElementById('kpiPessoalCagrSub').textContent = 'jan/2017–' + mesLabel(latest);
+  const cagr = computeCagrBuckets(bucketNames, ['pessoal_nao_consignado_pf', 'cheque_especial_pf']);
+  document.getElementById('kpiPessoalCagr').textContent = cagr == null ? '—' : fmtPct(cagr.value);
+  const keysPessoalCagr = Object.keys(DATA_RISCO.by_month_bucket).sort();
+  const idx12PessoalCagr = keysPessoalCagr.length - 13;
+  document.getElementById('kpiPessoalCagrSub').textContent = (idx12PessoalCagr >= 0 ? mesLabel(keysPessoalCagr[idx12PessoalCagr]) + '–' + mesLabel(latest) : '—') + (cagr ? (cagr.usaSgs ? ' · SGS' : ' · SCR') : '');
   document.getElementById('tituloPessoalTipoOpMes').textContent = mesLabel(latest);
   const pessoalSgs = sgsTotalsCombo(['pessoal_nao_consignado_pf', 'cheque_especial_pf'], ['pessoal_nao_consignado_pf', 'cheque_especial_pf'], latest);
   document.getElementById('kpiPessoalTotal').textContent = fmtBRLcompact(pessoalSgs ? pessoalSgs.ca : totalCa);
@@ -3277,7 +3339,7 @@ function renderPessoal() {
 }
 
 let chartCresPessoal;
-let activoModoCresPessoal = 'estoque';
+let activoModoCresPessoal = 'cagr';
 function renderCresPessoal() {
   const mesKeysR = Object.keys(DATA_RISCO.by_month_bucket).sort();
   const mesLabelsR = mesKeysR.map(mesLabel);
@@ -3374,7 +3436,7 @@ function renderVeiculos() {
 }
 
 let chartCresVeiculos;
-let activoModoCresVeiculos = 'estoque';
+let activoModoCresVeiculos = 'cagr';
 function renderCresVeiculos() {
   const mesKeysV = Object.keys(DATA_VEICULOS.by_month_bucket).sort();
   const mesLabelsV = mesKeysV.map(mesLabel);
@@ -3946,7 +4008,7 @@ function renderInadHabitacional() {
 }
 
 let chartCresHabitacional;
-let activoModoCresHabitacional = 'estoque';
+let activoModoCresHabitacional = 'cagr';
 function renderCresHabitacional() {
   const mesKeysH = Object.keys(DATA_HABITACIONAL.by_month_bucket).sort();
   const mesLabelsH = mesKeysH.map(mesLabel);
@@ -4425,7 +4487,7 @@ function renderDurationConsignado() {
 }
 
 let chartCresRural;
-let activoModoCresRural = 'estoque';
+let activoModoCresRural = 'cagr';
 function renderCresRural() {
   const sourceRural = activoClienteRural === 'pf' ? DATA_RURAL : DATA_RURAL_PJ;
   const mesKeysRu = Object.keys(sourceRural.by_month_bucket).sort();
@@ -6458,7 +6520,7 @@ function renderGrande() {
 }
 
 let chartCresGrande;
-let activoModoCresGrande = 'estoque';
+let activoModoCresGrande = 'cagr';
 function renderCresGrande() {
   const mesKeysGrande = Object.keys(DATA_GRANDE.by_month_bucket).sort();
   const mesLabelsGrande = mesKeysGrande.map(mesLabel);
@@ -6999,7 +7061,7 @@ function renderFidcAuto() {
 }
 
 let chartCresMpme;
-let activoModoCresMpme = 'estoque';
+let activoModoCresMpme = 'cagr';
 function renderCresMpme() {
   const mesKeysMpme = Object.keys(DATA_MPME.by_month_bucket).sort();
   const mesLabelsMpme = mesKeysMpme.map(mesLabel);
