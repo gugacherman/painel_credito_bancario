@@ -739,7 +739,7 @@
         <canvas id="chartInadCartao"></canvas>
       </div>
       <p style="font-size: 10px; color: var(--text-muted); margin: 2px 0 8px;">Zoom: arraste as alças abaixo do gráfico · duplo-clique para resetar.</p>
-      <p class="caveat"><strong>SCR + SGS:</strong> Estoque e inadimplência dos KPIs no topo (total cartão) vêm da série oficial do SGS — gap pequeno aqui (~0,7% no estoque, ~0,2 p.p. na inadimplência em jun/26). A quebra por tipo abaixo (rotativo/parcelado, gráficos de crescimento e inadimplência) continua via SCR: as séries SGS de "rotativo" e "parcelado" usam uma classificação antiga (pré Res. 4.549/2017) que não bate com a submodalidade do SCR — rotativo+parcelado no SGS somam mais que o próprio total SGS, sinal de que se sobrepõem, e usá-las invertia a proporção real (rotativo pareceria maior que parcelado, e inadimplência do rotativo saltava de ~15% pra ~63%). "Antecipação de fatura de cartão" também não tem série SGS própria. <strong>Trecho tracejado do rotativo (jan-jun/26):</strong> alta e queda concentradas no BB — o aumento da inadimplência foi por conta principalmente dele, que tem carteira grande e viu a inadimplência praticamente dobrar no período; conforme essa carteira foi vencendo e sendo baixada a prejuízo (write-off), a inadimplência voltou a se comportar razoavelmente em jun/26. Não foi erro de reporte — foi concessão de crédito ruim, com inadimplência real.</p>
+      <p class="caveat"><strong>SCR + SGS:</strong> Estoque e inadimplência dos KPIs no topo (total cartão) vêm da série oficial do SGS — gap pequeno aqui (~0,7% no estoque, ~0,2 p.p. na inadimplência em jun/26). A quebra por tipo abaixo (rotativo/parcelado, gráficos de crescimento e inadimplência) continua via SCR: as séries SGS de "rotativo" e "parcelado" usam uma classificação antiga (pré Res. 4.549/2017) que não bate com a submodalidade do SCR — rotativo+parcelado no SGS somam mais que o próprio total SGS, sinal de que se sobrepõem, e usá-las invertia a proporção real (rotativo pareceria maior que parcelado, e inadimplência do rotativo saltava de ~15% pra ~63%). "Antecipação de fatura de cartão" também não tem série SGS própria. <strong>Trecho tracejado do rotativo (dez/25-jun/26):</strong> alta e queda concentradas no BB — o aumento da inadimplência foi por conta principalmente dele, que tem carteira grande e viu a inadimplência praticamente dobrar no período; conforme essa carteira foi vencendo e sendo baixada a prejuízo (write-off), a inadimplência voltou a se comportar razoavelmente em jun/26. Não foi erro de reporte — foi concessão de crédito ruim, com inadimplência real.</p>
     </section>
 
     <section>
@@ -3555,12 +3555,12 @@ function renderInadCartao() {
     chartInadCartao.update();
   };
 
-  // Trecho jan/26-jun/26 tracejado na linha do rotativo: nao foi erro de reporte/contabil --
+  // Trecho dez/25-jun/26 tracejado na linha do rotativo: nao foi erro de reporte/contabil --
   // o BB errou na concessao de credito (parcelamento automatico de fatura sem entrada),
   // gerou inadimplencia real, que quase dobrou nesse periodo. Conforme essa carteira foi
   // vencendo e sendo baixada a prejuizo (write-off), a inadimplencia agregada voltou a se
   // comportar normalmente em jun/26 -- por isso o tracejado cobre a subida E a volta.
-  const evtBbStartIdx = mesKeysR.findIndex(k => k.slice(0, 7) === '2026-01');
+  const evtBbStartIdx = mesKeysR.findIndex(k => k.slice(0, 7) === '2025-12');
   const evtBbEndIdx = mesKeysR.findIndex(k => k.slice(0, 7) === '2026-06');
   const rotativoSegment = (evtBbStartIdx === -1 || evtBbEndIdx === -1) ? {} : {
     segment: { borderDash: (ctx) => (ctx.p0DataIndex >= evtBbStartIdx && ctx.p0DataIndex < evtBbEndIdx) ? [6, 4] : undefined },
