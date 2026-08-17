@@ -739,7 +739,7 @@
         <canvas id="chartInadCartao"></canvas>
       </div>
       <p style="font-size: 10px; color: var(--text-muted); margin: 2px 0 8px;">Zoom: arraste as alças abaixo do gráfico · duplo-clique para resetar.</p>
-      <p class="caveat"><strong>SCR + SGS:</strong> Estoque e inadimplência dos KPIs no topo (total cartão) vêm da série oficial do SGS — gap pequeno aqui (~0,7% no estoque, ~0,2 p.p. na inadimplência em jun/26). A quebra por tipo abaixo (rotativo/parcelado, gráficos de crescimento e inadimplência) continua via SCR: as séries SGS de "rotativo" e "parcelado" usam uma classificação antiga (pré Res. 4.549/2017) que não bate com a submodalidade do SCR — rotativo+parcelado no SGS somam mais que o próprio total SGS, sinal de que se sobrepõem, e usá-las invertia a proporção real (rotativo pareceria maior que parcelado, e inadimplência do rotativo saltava de ~15% pra ~63%). "Antecipação de fatura de cartão" também não tem série SGS própria. <span style="display:inline-flex;align-items:center;gap:4px;"><svg width="14" height="9" style="flex:none;"><line x1="7" y1="0" x2="7" y2="9" stroke="#898781" stroke-width="1.5" stroke-dasharray="3,2.5"/></svg></span> = passe o mouse perto da linha tracejada em jun/2026, no gráfico de inadimplência, pra ver a nota sobre a queda do rotativo (correção do BB).</p>
+      <p class="caveat"><strong>SCR + SGS:</strong> Estoque e inadimplência dos KPIs no topo (total cartão) vêm da série oficial do SGS — gap pequeno aqui (~0,7% no estoque, ~0,2 p.p. na inadimplência em jun/26). A quebra por tipo abaixo (rotativo/parcelado, gráficos de crescimento e inadimplência) continua via SCR: as séries SGS de "rotativo" e "parcelado" usam uma classificação antiga (pré Res. 4.549/2017) que não bate com a submodalidade do SCR — rotativo+parcelado no SGS somam mais que o próprio total SGS, sinal de que se sobrepõem, e usá-las invertia a proporção real (rotativo pareceria maior que parcelado, e inadimplência do rotativo saltava de ~15% pra ~63%). "Antecipação de fatura de cartão" também não tem série SGS própria. <strong>Trecho tracejado do rotativo (jan-jun/26):</strong> alta e queda concentradas no BB — o aumento da inadimplência foi por conta principalmente dele, que tem carteira grande e viu a inadimplência praticamente dobrar no período; conforme essa carteira foi vencendo e sendo baixada a prejuízo (write-off), a inadimplência voltou a se comportar razoavelmente em jun/26. Não foi erro de reporte — foi concessão de crédito ruim, com inadimplência real.</p>
     </section>
 
     <section>
@@ -3555,7 +3555,18 @@ function renderInadCartao() {
     chartInadCartao.update();
   };
 
-  const inadDatasets = CARTAO_INAD_KEYS.map((key) => {
+  // Trecho jan/26-jun/26 tracejado na linha do rotativo: nao foi erro de reporte/contabil --
+  // o BB errou na concessao de credito (parcelamento automatico de fatura sem entrada),
+  // gerou inadimplencia real, que quase dobrou nesse periodo. Conforme essa carteira foi
+  // vencendo e sendo baixada a prejuizo (write-off), a inadimplencia agregada voltou a se
+  // comportar normalmente em jun/26 -- por isso o tracejado cobre a subida E a volta.
+  const evtBbStartIdx = mesKeysR.findIndex(k => k.slice(0, 7) === '2026-01');
+  const evtBbEndIdx = mesKeysR.findIndex(k => k.slice(0, 7) === '2026-06');
+  const rotativoSegment = (evtBbStartIdx === -1 || evtBbEndIdx === -1) ? {} : {
+    segment: { borderDash: (ctx) => (ctx.p0DataIndex >= evtBbStartIdx && ctx.p0DataIndex < evtBbEndIdx) ? [6, 4] : undefined },
+  };
+
+  const inadDatasets = CARTAO_INAD_KEYS.map((key, keyIdx) => {
     const bucket = CARTAO_BUCKET_MAP[key];
     const sgsKey = CARTAO_KEY_TO_SGS_INAD[key];
     const data = mesKeysR.map(k => {
@@ -3568,54 +3579,21 @@ function renderInadCartao() {
       label: CARTAO_LABELS[key], data,
       borderColor: CARTAO_COLORS[key], backgroundColor: 'transparent',
       borderWidth: 1.5, pointRadius: 0, tension: 0.1, spanGaps: true,
+      ...(key === 'cartao_rotativo' ? rotativoSegment : {}),
     };
   });
-
-  // Marcador de evento: correcao do BB em jun/2026 (produto de parcelamento automatico de
-  // fatura sem entrada, "erro" admitido pelo banco) -- explica a queda forte e concentrada
-  // no rotativo (21,2% mai/26 -> 15,1% jun/26): segundo o JPMorgan, sem o BB o resto do
-  // sistema so' melhorou de 9,3% pra 9,1% no cartao total nesse periodo -- o problema era
-  // isolado do BB, e o rotativo (fatia pequena do estoque de cartao) amplifica o efeito.
-  const evtBbIdx = mesKeysR.findIndex(k => k.slice(0, 7) === '2026-06');
-  const evtBbSeries = mesKeysR.map((k, i) => i === evtBbIdx ? inadDatasets[0].data[i] : null);
-  const eventoBbDataset = {
-    label: 'Correção BB (jun/2026)',
-    data: evtBbSeries,
-    isAnnotation: true,
-    showLine: false,
-    borderColor: '#898781',
-    borderWidth: 0,
-    backgroundColor: 'transparent',
-    pointRadius: 0,
-    pointHoverRadius: 0,
-    pointHitRadius: 0,
-    spanGaps: false,
-    datalabels: { display: false },
-  };
 
   if (!chartInadCartao) {
     chartInadCartao = new Chart(document.getElementById('chartInadCartao'), {
       type: 'line',
-      plugins: [ChartDataLabels, eventAnnotationPlugin],
-      data: { labels: mesLabelsR, datasets: inadDatasets.concat([eventoBbDataset]) },
-      options: { responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          datalabels: datalabelsConfig,
-          tooltip: {
-            callbacks: {
-              label: (context) => context.dataset.isAnnotation
-                ? ['BB admitiu "erro" em produto de parcelamento automático', 'de fatura sem entrada e o suspendeu em jun/2026 —', 'explica a queda forte e concentrada no rotativo.', 'Sem o BB, o resto do sistema só melhorou de', '9,3% para 9,1% no cartão total no período (JPMorgan).']
-                : `${context.dataset.label}: ${context.formattedValue}%`,
-            },
-          },
-        },
+      plugins: [ChartDataLabels],
+      data: { labels: mesLabelsR, datasets: inadDatasets },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: datalabelsConfig },
         scales: { x: { ticks: { autoSkip: false, font: { size: 10 }, callback: sparseTickCallback }, grid: { display: false } }, y: { title: { display: true, text: '%' }, grid: { color: '#e1e0d9' } } } }
     });
   } else {
     chartInadCartao.data.labels = mesLabelsR;
-    inadDatasets.forEach((ds, i) => { chartInadCartao.data.datasets[i].data = ds.data; });
-    chartInadCartao.data.datasets[inadDatasets.length].data = evtBbSeries;
+    chartInadCartao.data.datasets.forEach((ds, i) => { ds.data = inadDatasets[i].data; ds.segment = inadDatasets[i].segment; });
     chartInadCartao.update();
   }
   initZoomBrush(chartInadCartao, ensureBrushUI('chartInadCartao'));
