@@ -1788,14 +1788,39 @@ function sgsSaldoValue(serieKey, mesKeyAnyDay) {
   const v = serie[ym(mesKeyAnyDay) + '-01'];
   return v == null ? null : v * 1e6;
 }
+// O SGS sai ~1 mes antes do SCR.data. Estende uma lista de meses do SCR com os meses do
+// SGS posteriores ao ultimo mes dela (calendario da serie geral_total, publicada junto com
+// as demais). Usar so em graficos/KPIs cujas series vem do SGS -- series que caem no SCR
+// ficam null nesses meses (a linha termina no ultimo mes do SCR).
+function comMesesSgs(mesKeys) {
+  if (!mesKeys.length) return mesKeys;
+  const ultimo = ym(mesKeys[mesKeys.length - 1]);
+  const extra = Object.keys(DATA_SGS_SALDO.series.geral_total || {})
+    .filter(k => ym(k) > ultimo && sgsInadValue('geral_total', k) != null)
+    .sort();
+  return mesKeys.concat(extra);
+}
+// Ultimo mes do SGS (>= mesScr) em que a serie de saldo/inad tem valor -- pros KPIs das abas.
+function ultimoMesSgs(mesScr, saldoKeys = [], inadKeys = []) {
+  const meses = comMesesSgs([mesScr]);
+  for (let i = meses.length - 1; i > 0; i--) {
+    const k = meses[i];
+    if (saldoKeys.every(s => sgsSaldoValue(s, k) != null) && inadKeys.every(s => sgsInadValue(s, k) != null)) return k;
+  }
+  return mesScr;
+}
 function fmtBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 }
-function fmtBRLcompact(v) {
+function fmtBRLcompact(v, casasFixas) {
   const sign = v < 0 ? '-' : '';
   v = Math.abs(v);
-  if (v >= 1e12) return sign + 'R$ ' + (v / 1e12).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' tri';
-  if (v >= 1e9) return sign + 'R$ ' + (v / 1e9).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' bi';
+  // casasFixas (opcional): numero exato de casas decimais, mantendo zeros a direita (ex.: 7,40 tri)
+  const fmt = casasFixas != null
+    ? { minimumFractionDigits: casasFixas, maximumFractionDigits: casasFixas }
+    : { maximumFractionDigits: 2 };
+  if (v >= 1e12) return sign + 'R$ ' + (v / 1e12).toLocaleString('pt-BR', fmt) + ' tri';
+  if (v >= 1e9) return sign + 'R$ ' + (v / 1e9).toLocaleString('pt-BR', fmt) + ' bi';
   if (v >= 1e6) return sign + 'R$ ' + (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mi';
   return fmtBRL(v);
 }
@@ -2239,7 +2264,7 @@ function render() {
   document.getElementById('kpiCarteiraMesLabel').textContent = mesLabel(carteiraKpiKey);
   const caSgsLatest = sgsSerieGeral ? sgsSaldoValue(sgsSerieGeral, carteiraKpiKey) : null;
   const caLatestExib = caSgsLatest != null ? caSgsLatest : caLatest;
-  document.getElementById('kpiCarteira').textContent = fmtBRLcompact(caLatestExib);
+  document.getElementById('kpiCarteira').textContent = fmtBRLcompact(caLatestExib, 2);
   if (carteiraKpiYoyKey) {
     const caYoyExib = caSgsLatest != null ? sgsSaldoValue(sgsSerieGeral, carteiraKpiYoyKey) : sumCliente(DATA.month_cliente[yoyKey], activeCliente)[1];
     const growth = caYoyExib > 0 ? ((caLatestExib - caYoyExib) / caYoyExib * 100) : 0;
@@ -2763,6 +2788,8 @@ const SEGMENTOS_EVOLUCAO = [
       const pf = sgsSaldoValue('rural_pf_total', k) ?? genericMonthTotal(DATA_RURAL.by_month_bucket, k);
       const pj = genericMonthTotal(DATA_RURAL_PJ.by_month_bucket, k);
       if (pf == null && pj == null) return null;
+      // meses so do SGS (alem do SCR): sem a parte PJ, o total ficaria subestimado
+      if (pj == null && ym(k) > ym(DATA.latest_month || Object.keys(DATA.month_cliente).sort().pop())) return null;
       return (pf || 0) + (pj || 0);
     }
   },
@@ -2771,7 +2798,7 @@ const SEGMENTOS_EVOLUCAO = [
 ];
 
 function renderEvolucaoSegmentos() {
-  const mesKeys = Object.keys(DATA.month_cliente).sort();
+  const mesKeys = comMesesSgs(Object.keys(DATA.month_cliente).sort());
   const mesLabels = mesKeys.map(mesLabel);
 
   document.getElementById('legendEvolucaoSegmentos').innerHTML = SEGMENTOS_EVOLUCAO.map((s, i) => {
@@ -2863,7 +2890,12 @@ function computeCagr(byMonth, sgsKey) {
   // Apesar do nome (mantido por compatibilidade), calcula YoY simples do período
   // vigente (mês mais recente vs. mesmo mês 12 meses atrás), não mais CAGR desde 2017.
   // Usa SGS quando sgsKey cobrir os dois meses (mesmo mês/mesmo ano-atras); senão, SCR.
-  const keys = Object.keys(byMonth).sort();
+  let keys = Object.keys(byMonth).sort();
+  if (sgsKey) {
+    // SGS a frente do SCR: o YoY anda junto (ex.: ago/26 vs ago/25)
+    const ext = comMesesSgs(keys);
+    if (sgsSaldoValue(sgsKey, ext[ext.length - 1]) != null) keys = ext;
+  }
   const idx12 = keys.length - 13;
   if (idx12 < 0) return null;
   const firstKey = keys[idx12];
@@ -2874,10 +2906,11 @@ function computeCagr(byMonth, sgsKey) {
   if (sgsFirst != null && sgsLast != null) {
     first = sgsFirst; last = sgsLast; usaSgs = true;
   } else {
+    if (!byMonth[firstKey] || !byMonth[lastKey]) return null;
     first = byMonth[firstKey][2]; last = byMonth[lastKey][2]; usaSgs = false;
   }
   if (!(first > 0) || !(last > 0)) return null;
-  return { value: (last / first - 1) * 100, usaSgs };
+  return { value: (last / first - 1) * 100, usaSgs, firstKey, lastKey };
 }
 
 // Rural (PF + PJ): PF tenta SGS (rural_pf_total), PJ sempre SCR (sem serie SGS viva) --
@@ -2927,7 +2960,8 @@ function renderCagrCards() {
     if (subEl) {
       const keys = Object.keys(byMonth).sort();
       const idx12 = keys.length - 13;
-      if (idx12 >= 0) subEl.textContent = mesLabel(keys[idx12]) + '–' + mesLabel(keys[keys.length - 1]) + (result ? (result.usaSgs ? ' · SGS' : ' · SCR') : '');
+      if (result && result.firstKey) subEl.textContent = mesLabel(result.firstKey) + '–' + mesLabel(result.lastKey) + (result.usaSgs ? ' · SGS' : ' · SCR');
+      else if (idx12 >= 0) subEl.textContent = mesLabel(keys[idx12]) + '–' + mesLabel(keys[keys.length - 1]) + (result ? (result.usaSgs ? ' · SGS' : ' · SCR') : '');
     }
   });
 }
@@ -2976,14 +3010,15 @@ function renderConsignado() {
   for (const occ in rows) { for (let i = 0; i < 5; i++) total[i] += rows[occ][i]; }
   const [totalN, totalCa, totalCv, totalCi, totalAp] = total;
 
-  const consigSaldoSgs = sgsSaldoValue('consignado_total', latest);
-  const consigInadSgs = sgsInadValue('consignado_total', latest);
+  const latestSgs = ultimoMesSgs(latest, ['consignado_total'], ['consignado_total']);
+  const consigSaldoSgs = sgsSaldoValue('consignado_total', latestSgs);
+  const consigInadSgs = sgsInadValue('consignado_total', latestSgs);
   document.getElementById('kpiConsigTotal').textContent = fmtBRLcompact(consigSaldoSgs != null ? consigSaldoSgs : totalCa);
-  document.getElementById('kpiConsigTotalSub').textContent = mesLabel(latest) + (consigSaldoSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiConsigTotalSub').textContent = consigSaldoSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiConsigOps').textContent = fmtNum(totalN);
   document.getElementById('kpiConsigOpsSub').textContent = mesLabel(latest);
   document.getElementById('kpiConsigInad').textContent = consigInadSgs != null ? fmtPct(consigInadSgs) : (totalCa > 0 ? fmtPct(totalCi / totalCa * 100) : '—');
-  document.getElementById('kpiConsigInadSub').textContent = mesLabel(latest) + (consigInadSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiConsigInadSub').textContent = consigInadSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiConsigTicket').textContent = totalN > 0 ? fmtBRL(totalCa / totalN) : '—';
   document.getElementById('kpiConsigTicketSub').textContent = mesLabel(latest);
   document.getElementById('subtitleConsignadoMes').textContent = mesLabel(latest);
@@ -3016,7 +3051,7 @@ function renderConsignado() {
 
 let activoModoCres = 'cagr';
 function renderCresConsignado() {
-  const mesKeysC = Object.keys(DATA_CONSIGNADO.by_month_ocupacao).sort();
+  const mesKeysC = comMesesSgs(Object.keys(DATA_CONSIGNADO.by_month_ocupacao).sort());
   const mesLabelsC = mesKeysC.map(mesLabel);
   const lookback = activoModoCres === 'cagr' ? 12 : (activoModoCres === 'mom' ? 1 : 0);
   const cresStartIdx = Math.max(lookback, mesKeysC.indexOf('2018-07-31'));
@@ -3114,7 +3149,7 @@ function inadConsignadoRawSeries(key, mesKeysC) {
 
 let chartInadConsignado;
 function renderInadConsignado() {
-  const mesKeysC = Object.keys(DATA_CONSIGNADO.by_month_ocupacao).sort();
+  const mesKeysC = comMesesSgs(Object.keys(DATA_CONSIGNADO.by_month_ocupacao).sort());
   const mesLabelsC = mesKeysC.map(mesLabel);
 
   document.getElementById('legendInadConsignado').innerHTML = CRES_KEYS.map((key, i) => {
@@ -3310,6 +3345,7 @@ function scorecardDeltaPill(delta) {
   return `<span class="delta-pill ${cls}"><span class="arrow">▲</span>${fmtPP(delta)}</span>`;
 }
 
+const SCORECARD_TABS_SO_SGS = ['consignado', 'cartao', 'pessoal', 'veiculos', 'habitacional'];
 function renderScorecard() {
   // Filtro Todos/PF/PJ do topo (activeCliente) também restringe as linhas do painel:
   // Consignado/Cartão/Crédito pessoal/Veículos/Habitacional só existem para pessoa física;
@@ -3322,7 +3358,14 @@ function renderScorecard() {
 
   const computed = visibleSegs.map(seg => {
     const byMonth = seg.byMonth();
-    const keys = Object.keys(byMonth).sort();
+    let keys = Object.keys(byMonth).sort();
+    // Segmentos 100% SGS andam com o SGS (que sai ~1 mes antes); Grande/MPME (so SCR) e
+    // Rural com parte PJ (SCR) ficam no ultimo mes do SCR.
+    const soSgs = SCORECARD_TABS_SO_SGS.includes(seg.tab) || (seg.tab === 'rural' && activeCliente === 'PF');
+    if (soSgs) {
+      const ext = comMesesSgs(keys);
+      if (ext.length > keys.length && seg.getTotals(byMonth, ext[ext.length - 1])) keys = ext;
+    }
     const latest = keys[keys.length - 1];
     const idx1 = keys.length - 2;
     const key1 = idx1 >= 0 ? keys[idx1] : null;
@@ -3355,7 +3398,12 @@ function renderScorecard() {
 
   const maxCa = Math.max(...computed.map(c => c.caLatest), 1);
 
-  document.getElementById('scorecardAsOf').textContent = computed.length ? 'Base: ' + computed[0].latestLabel : '—';
+  // Base: mes mais recente; segmentos que ficaram num mes anterior (so SCR) aparecem entre parenteses
+  const porMes = {};
+  computed.forEach(c => { (porMes[c.latestLabel] = porMes[c.latestLabel] || []).push(c.label); });
+  const mesesBase = Object.keys(porMes).sort((a, b) => porMes[b].length - porMes[a].length);
+  document.getElementById('scorecardAsOf').textContent = !computed.length ? '—'
+    : 'Base: ' + mesesBase[0] + mesesBase.slice(1).map(m => ` (${porMes[m].join(', ')}: ${m})`).join('');
 
   const subtitleEl = document.getElementById('scorecardSubtitle');
   if (activeCliente === 'all') {
@@ -3390,7 +3438,11 @@ document.getElementById('tableScorecard').addEventListener('click', (e) => {
 function computeCagrBuckets(bucketNames, sgsSaldoKeys) {
   // Idem computeCagr: nome mantido, mas calcula YoY do período vigente, não CAGR desde 2017.
   // Usa a soma das series SGS em sgsSaldoKeys quando cobrirem os dois meses; senão, SCR.
-  const keys = Object.keys(DATA_RISCO.by_month_bucket).sort();
+  let keys = Object.keys(DATA_RISCO.by_month_bucket).sort();
+  if (sgsSaldoKeys) {
+    const ext = comMesesSgs(keys);
+    if (sgsSaldoSum(sgsSaldoKeys, ext[ext.length - 1]) != null) keys = ext;
+  }
   const idx12 = keys.length - 13;
   if (idx12 < 0) return null;
   const key12 = keys[idx12], latest = keys[keys.length - 1];
@@ -3409,7 +3461,7 @@ function computeCagrBuckets(bucketNames, sgsSaldoKeys) {
     first = sumCa(key12); last = sumCa(latest); usaSgs = false;
   }
   if (!(first > 0) || !(last > 0)) return null;
-  return { value: (last / first - 1) * 100, usaSgs };
+  return { value: (last / first - 1) * 100, usaSgs, firstKey: key12, lastKey: latest };
 }
 
 let chartCartaoParceladoPrazo;
@@ -3559,16 +3611,19 @@ function renderCartao() {
   document.getElementById('kpiCartaoCagr').textContent = cagr == null ? '—' : fmtPct(cagr.value);
   const keysCartaoCagr = Object.keys(DATA_RISCO.by_month_bucket).sort();
   const idx12CartaoCagr = keysCartaoCagr.length - 13;
-  document.getElementById('kpiCartaoCagrSub').textContent = (idx12CartaoCagr >= 0 ? mesLabel(keysCartaoCagr[idx12CartaoCagr]) + '–' + mesLabel(latest) : '—') + (cagr ? (cagr.usaSgs ? ' · SGS' : ' · SCR') : '');
+  document.getElementById('kpiCartaoCagrSub').textContent = cagr
+    ? mesLabel(cagr.firstKey) + '–' + mesLabel(cagr.lastKey) + (cagr.usaSgs ? ' · SGS' : ' · SCR')
+    : (idx12CartaoCagr >= 0 ? mesLabel(keysCartaoCagr[idx12CartaoCagr]) + '–' + mesLabel(latest) : '—');
   document.getElementById('tituloCartaoTipoOpMes').textContent = mesLabel(latest);
-  const cartaoSaldoSgs = sgsSaldoValue('cartao_total_pf', latest);
-  const cartaoInadSgs = sgsInadValue('cartao_total_pf', latest);
+  const latestSgs = ultimoMesSgs(latest, ['cartao_total_pf'], ['cartao_total_pf']);
+  const cartaoSaldoSgs = sgsSaldoValue('cartao_total_pf', latestSgs);
+  const cartaoInadSgs = sgsInadValue('cartao_total_pf', latestSgs);
   document.getElementById('kpiCartaoTotal').textContent = fmtBRLcompact(cartaoSaldoSgs != null ? cartaoSaldoSgs : totalCa);
-  document.getElementById('kpiCartaoTotalSub').textContent = mesLabel(latest) + (cartaoSaldoSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiCartaoTotalSub').textContent = cartaoSaldoSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiCartaoOps').textContent = fmtNum(totalN);
   document.getElementById('kpiCartaoOpsSub').textContent = mesLabel(latest);
   document.getElementById('kpiCartaoInad').textContent = cartaoInadSgs != null ? fmtPct(cartaoInadSgs) : (totalCa > 0 ? fmtPct(totalCi / totalCa * 100) : '—');
-  document.getElementById('kpiCartaoInadSub').textContent = mesLabel(latest) + (cartaoInadSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiCartaoInadSub').textContent = cartaoInadSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiCartaoTicket').textContent = totalN > 0 ? fmtBRL(totalCa / totalN) : '—';
   document.getElementById('kpiCartaoTicketSub').textContent = mesLabel(latest);
 
@@ -3752,15 +3807,19 @@ function renderPessoal() {
   document.getElementById('kpiPessoalCagr').textContent = cagr == null ? '—' : fmtPct(cagr.value);
   const keysPessoalCagr = Object.keys(DATA_RISCO.by_month_bucket).sort();
   const idx12PessoalCagr = keysPessoalCagr.length - 13;
-  document.getElementById('kpiPessoalCagrSub').textContent = (idx12PessoalCagr >= 0 ? mesLabel(keysPessoalCagr[idx12PessoalCagr]) + '–' + mesLabel(latest) : '—') + (cagr ? (cagr.usaSgs ? ' · SGS' : ' · SCR') : '');
+  document.getElementById('kpiPessoalCagrSub').textContent = cagr
+    ? mesLabel(cagr.firstKey) + '–' + mesLabel(cagr.lastKey) + (cagr.usaSgs ? ' · SGS' : ' · SCR')
+    : (idx12PessoalCagr >= 0 ? mesLabel(keysPessoalCagr[idx12PessoalCagr]) + '–' + mesLabel(latest) : '—');
   document.getElementById('tituloPessoalTipoOpMes').textContent = mesLabel(latest);
-  const pessoalSgs = sgsTotalsCombo(['pessoal_nao_consignado_pf', 'cheque_especial_pf'], ['pessoal_nao_consignado_pf', 'cheque_especial_pf'], latest);
+  const pessoalSgsKeys = ['pessoal_nao_consignado_pf', 'cheque_especial_pf'];
+  const latestSgs = ultimoMesSgs(latest, pessoalSgsKeys, pessoalSgsKeys);
+  const pessoalSgs = sgsTotalsCombo(pessoalSgsKeys, pessoalSgsKeys, latestSgs);
   document.getElementById('kpiPessoalTotal').textContent = fmtBRLcompact(pessoalSgs ? pessoalSgs.ca : totalCa);
-  document.getElementById('kpiPessoalTotalSub').textContent = mesLabel(latest) + (pessoalSgs ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiPessoalTotalSub').textContent = pessoalSgs ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiPessoalOps').textContent = fmtNum(totalN);
   document.getElementById('kpiPessoalOpsSub').textContent = mesLabel(latest);
   document.getElementById('kpiPessoalInad').textContent = pessoalSgs ? fmtPct(pessoalSgs.ci / pessoalSgs.ca * 100) : (totalCa > 0 ? fmtPct(totalCi / totalCa * 100) : '—');
-  document.getElementById('kpiPessoalInadSub').textContent = mesLabel(latest) + (pessoalSgs ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiPessoalInadSub').textContent = pessoalSgs ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiPessoalTicket').textContent = totalN > 0 ? fmtBRL(totalCa / totalN) : '—';
   document.getElementById('kpiPessoalTicketSub').textContent = mesLabel(latest);
 
@@ -3791,7 +3850,7 @@ function renderPessoal() {
 let chartCresPessoal;
 let activoModoCresPessoal = 'cagr';
 function renderCresPessoal() {
-  const mesKeysR = Object.keys(DATA_RISCO.by_month_bucket).sort();
+  const mesKeysR = comMesesSgs(Object.keys(DATA_RISCO.by_month_bucket).sort());
   const mesLabelsR = mesKeysR.map(mesLabel);
   const lookback = activoModoCresPessoal === 'cagr' ? 12 : (activoModoCresPessoal === 'mom' ? 1 : 0);
   const cresStartIdx = lookback;
@@ -3871,14 +3930,15 @@ function renderVeiculos() {
   const rows = DATA_VEICULOS.by_month_bucket[latest];
   const [n, ca, cv, ci, ap] = rows[VEICULOS_BUCKET];
 
-  const veicSaldoSgs = sgsSaldoValue('veiculos_pf', latest);
-  const veicInadSgs = sgsInadValue('veiculos_pf', latest);
+  const latestSgs = ultimoMesSgs(latest, ['veiculos_pf'], ['veiculos_pf']);
+  const veicSaldoSgs = sgsSaldoValue('veiculos_pf', latestSgs);
+  const veicInadSgs = sgsInadValue('veiculos_pf', latestSgs);
   document.getElementById('kpiVeicTotal').textContent = fmtBRLcompact(veicSaldoSgs != null ? veicSaldoSgs : ca);
-  document.getElementById('kpiVeicTotalSub').textContent = mesLabel(latest) + (veicSaldoSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiVeicTotalSub').textContent = veicSaldoSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiVeicOps').textContent = fmtNum(n);
   document.getElementById('kpiVeicOpsSub').textContent = mesLabel(latest);
   document.getElementById('kpiVeicInad').textContent = veicInadSgs != null ? fmtPct(veicInadSgs) : (ca > 0 ? fmtPct(ci / ca * 100) : '—');
-  document.getElementById('kpiVeicInadSub').textContent = mesLabel(latest) + (veicInadSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiVeicInadSub').textContent = veicInadSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiVeicTicket').textContent = n > 0 ? fmtBRL(ca / n) : '—';
   document.getElementById('kpiVeicTicketSub').textContent = mesLabel(latest);
 
@@ -3888,7 +3948,7 @@ function renderVeiculos() {
 let chartCresVeiculos;
 let activoModoCresVeiculos = 'cagr';
 function renderCresVeiculos() {
-  const mesKeysV = Object.keys(DATA_VEICULOS.by_month_bucket).sort();
+  const mesKeysV = comMesesSgs(Object.keys(DATA_VEICULOS.by_month_bucket).sort());
   const mesLabelsV = mesKeysV.map(mesLabel);
   const lookback = activoModoCresVeiculos === 'cagr' ? 12 : (activoModoCresVeiculos === 'mom' ? 1 : 0);
   const cresStartIdx = lookback;
@@ -4368,15 +4428,16 @@ function renderHabitacional() {
   for (const b in rows) { for (let i = 0; i < 5; i++) total[i] += rows[b][i]; }
   const [totalN, totalCa, totalCv, totalCi, totalAp] = total;
 
-  const habitSaldoSgs = sgsSaldoValue('habitacional_total_pf', latest);
-  const habitInadSgs = sgsInadValue('habitacional_total_pf', latest);
+  const latestSgs = ultimoMesSgs(latest, ['habitacional_total_pf'], ['habitacional_total_pf']);
+  const habitSaldoSgs = sgsSaldoValue('habitacional_total_pf', latestSgs);
+  const habitInadSgs = sgsInadValue('habitacional_total_pf', latestSgs);
   document.getElementById('kpiHabitTotal').textContent = fmtBRLcompact(habitSaldoSgs != null ? habitSaldoSgs : totalCa);
-  document.getElementById('kpiHabitTotalSub').textContent = mesLabel(latest) + (habitSaldoSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiHabitTotalSub').textContent = habitSaldoSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('tituloHabitTipoFinMes').textContent = mesLabel(latest);
   document.getElementById('kpiHabitOps').textContent = fmtNum(totalN);
   document.getElementById('kpiHabitOpsSub').textContent = mesLabel(latest);
   document.getElementById('kpiHabitInad').textContent = habitInadSgs != null ? fmtPct(habitInadSgs) : (totalCa > 0 ? fmtPct(totalCi / totalCa * 100) : '—');
-  document.getElementById('kpiHabitInadSub').textContent = mesLabel(latest) + (habitInadSgs != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiHabitInadSub').textContent = habitInadSgs != null ? mesLabel(latestSgs) + ' · SGS' : mesLabel(latest) + ' · SCR';
   document.getElementById('kpiHabitTicket').textContent = totalN > 0 ? fmtBRL(totalCa / totalN) : '—';
   document.getElementById('kpiHabitTicketSub').textContent = mesLabel(latest);
 
@@ -4408,7 +4469,7 @@ function renderHabitacional() {
 
 let chartInadHabitacional;
 function renderInadHabitacional() {
-  const mesKeysH = Object.keys(DATA_HABITACIONAL.by_month_bucket).sort();
+  const mesKeysH = comMesesSgs(Object.keys(DATA_HABITACIONAL.by_month_bucket).sort());
   const mesLabelsH = mesKeysH.map(mesLabel);
 
   document.getElementById('legendInadHabitacional').innerHTML = HABITACIONAL_KEYS.map((key, i) => {
@@ -4460,7 +4521,7 @@ function renderInadHabitacional() {
 let chartCresHabitacional;
 let activoModoCresHabitacional = 'cagr';
 function renderCresHabitacional() {
-  const mesKeysH = Object.keys(DATA_HABITACIONAL.by_month_bucket).sort();
+  const mesKeysH = comMesesSgs(Object.keys(DATA_HABITACIONAL.by_month_bucket).sort());
   const mesLabelsH = mesKeysH.map(mesLabel);
   const lookback = activoModoCresHabitacional === 'cagr' ? 12 : (activoModoCresHabitacional === 'mom' ? 1 : 0);
   const cresStartIdx = lookback;
