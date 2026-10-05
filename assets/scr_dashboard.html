@@ -2175,7 +2175,15 @@ function render() {
   // confiavel, ver caveat); PJ nao tem serie SGS viva equivalente, continua via SCR.
   const sgsSerieGeral = activeCliente === 'PJ' ? null : (activeCliente === 'PF' ? 'geral_pf' : 'geral_total');
   const carteiraUsaSgs = sgsSerieGeral != null && mesKeys.every(k => sgsSaldoValue(sgsSerieGeral, k) != null);
-  const carteiraRaw = mesKeys.map(k => carteiraUsaSgs ? sgsSaldoValue(sgsSerieGeral, k) : sumCliente(DATA.month_cliente[k], activeCliente)[1]);
+  // O SGS sai ~1 mes antes do SCR.data: quando a carteira vem do SGS, o eixo da carteira
+  // (KPIs + grafico) se estende pelos meses do SGS posteriores ao ultimo mes do SCR.
+  const ultimoYmScr = ym(mesKeys[mesKeys.length - 1]);
+  const mesesSgsExtra = carteiraUsaSgs
+    ? Object.keys(DATA_SGS_SALDO.series[sgsSerieGeral]).filter(k => ym(k) > ultimoYmScr).sort()
+    : [];
+  const carteiraKeys = mesKeys.concat(mesesSgsExtra);
+  const carteiraMesLabels = carteiraKeys.map(mesLabel);
+  const carteiraRaw = carteiraKeys.map(k => carteiraUsaSgs ? sgsSaldoValue(sgsSerieGeral, k) : sumCliente(DATA.month_cliente[k], activeCliente)[1]);
   const lookbackCarteira = activoModoCarteira === 'cagr' ? 12 : (activoModoCarteira === 'mom' ? 1 : 0);
   const carteiraStartIdx = lookbackCarteira;
   const carteiraSeries = activoModoCarteira === 'estoque'
@@ -2184,7 +2192,7 @@ function render() {
         if (j < lookbackCarteira || v == null || carteiraRaw[j - lookbackCarteira] == null || carteiraRaw[j - lookbackCarteira] <= 0) return null;
         return (v / carteiraRaw[j - lookbackCarteira] - 1) * 100;
       });
-  const cagrLabels = mesLabels.slice(carteiraStartIdx);
+  const cagrLabels = carteiraMesLabels.slice(carteiraStartIdx);
   const cagrValues = carteiraSeries.slice(carteiraStartIdx);
   const apSeries = mesKeys.map(k => {
     const [n, ca, cv, ci, ap] = sumCliente(DATA.month_cliente[k], activeCliente);
@@ -2210,14 +2218,14 @@ function render() {
   const [nLatest, caLatest, cvLatest, ciLatest, apLatest] = sumCliente(DATA.month_cliente[latestKey], activeCliente);
 
   // YoY do período vigente (mês mais recente vs. mesmo mês 12 meses atrás), não mais CAGR desde 2017.
-  const geralYoy12Ca = mesKeys.length >= 13 ? carteiraRaw[mesKeys.length - 13] : null;
+  const geralYoy12Ca = carteiraKeys.length >= 13 ? carteiraRaw[carteiraKeys.length - 13] : null;
   const geralLastCa = carteiraRaw[carteiraRaw.length - 1];
   let geralCagr = null;
   if (geralYoy12Ca > 0 && geralLastCa > 0) {
     geralCagr = (geralLastCa / geralYoy12Ca - 1) * 100;
   }
   document.getElementById('kpiGeralCagr').textContent = geralCagr == null ? '—' : fmtPct(geralCagr);
-  document.getElementById('kpiGeralCagrSub').textContent = (mesKeys.length >= 13 ? `${mesLabels[mesLabels.length - 13]}–${mesLabels[mesLabels.length - 1]}` : '—') + (carteiraUsaSgs ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiGeralCagrSub').textContent = (carteiraKeys.length >= 13 ? `${carteiraMesLabels[carteiraMesLabels.length - 13]}–${carteiraMesLabels[carteiraMesLabels.length - 1]}` : '—') + (carteiraUsaSgs ? ' · SGS' : ' · SCR');
 
   const mesMaisRecenteGeral = mesLabels[mesLabels.length - 1];
   ['subtitleJanelaMes', 'kpiCarteiraMesLabel', 'tituloTop10UfMes', 'tituloTopModMes', 'tituloTipoInstMes', 'tituloRankUfMes', 'tituloRankModMes', 'tituloRankingsMes'].forEach(id => {
@@ -2225,19 +2233,27 @@ function render() {
     if (el) el.textContent = mesMaisRecenteGeral;
   });
 
-  const caSgsLatest = sgsSerieGeral ? sgsSaldoValue(sgsSerieGeral, latestKey) : null;
+  // Mes do KPI de carteira: ultimo mes do SGS quando ele esta a frente do SCR.
+  const carteiraKpiKey = carteiraKeys[carteiraKeys.length - 1];
+  const carteiraKpiYoyKey = carteiraKeys[carteiraKeys.length - 13] || null;
+  document.getElementById('kpiCarteiraMesLabel').textContent = mesLabel(carteiraKpiKey);
+  const caSgsLatest = sgsSerieGeral ? sgsSaldoValue(sgsSerieGeral, carteiraKpiKey) : null;
   const caLatestExib = caSgsLatest != null ? caSgsLatest : caLatest;
   document.getElementById('kpiCarteira').textContent = fmtBRLcompact(caLatestExib);
-  if (yoyKey) {
-    const caYoyExib = caSgsLatest != null ? sgsSaldoValue(sgsSerieGeral, yoyKey) : sumCliente(DATA.month_cliente[yoyKey], activeCliente)[1];
+  if (carteiraKpiYoyKey) {
+    const caYoyExib = caSgsLatest != null ? sgsSaldoValue(sgsSerieGeral, carteiraKpiYoyKey) : sumCliente(DATA.month_cliente[yoyKey], activeCliente)[1];
     const growth = caYoyExib > 0 ? ((caLatestExib - caYoyExib) / caYoyExib * 100) : 0;
     document.getElementById('kpiCarteiraSub').textContent = (growth >= 0 ? '+' : '') + fmtPct(growth) + ' em 12 meses' + (caSgsLatest != null ? ' · SGS' : ' · SCR');
   }
-  const inadSgsLatest = sgsSerieGeral ? sgsInadValue(sgsSerieGeral, latestKey) : null;
+  // Inadimplencia (Todos/PF) tambem anda com o SGS quando ele esta a frente do SCR.
+  const inadKeysSgs = sgsSerieGeral ? Object.keys(DATA_SGS_INAD.series[sgsSerieGeral] || {}).sort() : [];
+  const inadSgsAFrente = inadKeysSgs.length >= 2 && ym(inadKeysSgs[inadKeysSgs.length - 1]) > ultimoYmScr;
+  const inadKey = inadSgsAFrente ? inadKeysSgs[inadKeysSgs.length - 1] : latestKey;
+  const inadSgsLatest = sgsSerieGeral ? sgsInadValue(sgsSerieGeral, inadKey) : null;
   document.getElementById('kpiInadimplencia').textContent = inadSgsLatest != null ? fmtPct(inadSgsLatest) : (caLatest > 0 ? fmtPct(ciLatest / caLatest * 100) : '—');
-  document.getElementById('kpiInadimplenciaSub').textContent = mesLabel(latestKey) + (inadSgsLatest != null ? ' · SGS' : ' · SCR');
+  document.getElementById('kpiInadimplenciaSub').textContent = mesLabel(inadKey) + (inadSgsLatest != null ? ' · SGS' : ' · SCR');
   const inadAtual = inadSgsLatest != null ? inadSgsLatest : (caLatest > 0 ? ciLatest / caLatest * 100 : null);
-  const prevKey = mesKeys[mesKeys.length - 2] || null;
+  const prevKey = inadSgsAFrente ? inadKeysSgs[inadKeysSgs.length - 2] : (mesKeys[mesKeys.length - 2] || null);
   let inadPrev = null;
   if (prevKey) {
     if (sgsSerieGeral) {
@@ -2259,11 +2275,11 @@ function render() {
   const spark12 = mesKeys.slice(-12).map(k => sumCliente(DATA.month_cliente[k], activeCliente));
   const spark12keys = mesKeys.slice(-12);
   const caSpark = sgsSerieGeral
-    ? spark12keys.map(k => sgsSaldoValue(sgsSerieGeral, k))
+    ? carteiraKeys.slice(-12).map(k => sgsSaldoValue(sgsSerieGeral, k))
     : spark12.map(r => r[1]);
   renderSparkline('kpiCarteiraSpark', caSpark, '#2a78d6');
   const inadSpark = sgsSerieGeral
-    ? spark12keys.map(k => sgsInadValue(sgsSerieGeral, k))
+    ? (inadSgsAFrente ? inadKeysSgs.slice(-12) : spark12keys).map(k => sgsInadValue(sgsSerieGeral, k))
     : spark12.map(r => r[1] > 0 ? r[3] / r[1] * 100 : null);
   renderSparkline('kpiInadimplenciaSpark', inadSpark, '#e34948');
   renderSparkline('kpiAtivoProblematicoSpark', spark12.map(r => r[1] > 0 ? r[4] / r[1] * 100 : null), '#e34948');
@@ -2304,6 +2320,18 @@ function render() {
       chartCarteira.options.scales.x.min = undefined;
       chartCarteira.options.scales.x.max = undefined;
       resetCarteiraZoom = false;
+    }
+    // O eixo muda de tamanho entre filtros (Todos/PF seguem o SGS, que pode ter 1 mes a
+    // mais que o SCR do PJ). Se o min/max do zoom nao existe mais nos labels, o Chart.js
+    // acrescenta o label sozinho -- limpa antes; o initZoomBrush abaixo reclampa por indice.
+    const xs = chartCarteira.options.scales.x;
+    if (xs.min != null && !cagrLabels.includes(xs.min)) xs.min = undefined;
+    const brushMaxEl = document.getElementById('chartCarteiraBrushMax');
+    const maxNoFim = brushMaxEl && parseInt(brushMaxEl.value, 10) >= parseInt(brushMaxEl.max, 10);
+    if (xs.max != null && (!cagrLabels.includes(xs.max) || maxNoFim)) {
+      // janela colada no fim continua colada no fim (mostra o mes mais recente do novo eixo)
+      xs.max = undefined;
+      if (brushMaxEl) { brushMaxEl.max = String(cagrLabels.length - 1); brushMaxEl.value = String(cagrLabels.length - 1); }
     }
     chartCarteira.update();
   }
