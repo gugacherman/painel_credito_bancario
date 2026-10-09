@@ -1344,11 +1344,11 @@
 
     <section>
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;">
-        <h2 style="margin:0;" id="tituloCresRural">Crescimento mês a mês por tipo (%)</h2>
+        <h2 style="margin:0;" id="tituloCresRural">Estoque por tipo (R$ bi)</h2>
         <div class="filters" id="periodoCresRural" style="margin: 0;">
-          <button class="filter-btn" data-modo="estoque">Estoque</button>
+          <button class="filter-btn active" data-modo="estoque">Estoque</button>
           <button class="filter-btn" data-modo="mom">M/M</button>
-          <button class="filter-btn active" data-modo="cagr">YoY</button>
+          <button class="filter-btn" data-modo="cagr">YoY</button>
         </div>
       </div>
       <p style="font-size: 12px; color: var(--text-muted); margin: 10px 0 10px;">Clique num item da legenda para ocultar/mostrar a série</p>
@@ -5018,7 +5018,7 @@ function renderDurationConsignado() {
 }
 
 let chartCresRural;
-let activoModoCresRural = 'cagr';
+let activoModoCresRural = 'estoque';
 function renderCresRural() {
   const sourceRural = activoClienteRural === 'pf' ? DATA_RURAL : DATA_RURAL_PJ;
   const mesKeysRu = Object.keys(sourceRural.by_month_bucket).sort();
