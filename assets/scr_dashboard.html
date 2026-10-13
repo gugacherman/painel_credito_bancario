@@ -2430,18 +2430,30 @@ function render() {
   initZoomBrush(chartRisco, ensureBrushUI('chartRisco'));
 
   const gapRiscoValues = mesKeys.map((k, i) => sev90Series[i] - sev15_90Series[i]);
+  // mesmo marcador da Res. CMN 4.966 (jan/2025) do chartRisco, ancorado no valor do gap
+  const evtWo4966GapSeries = gapRiscoValues.map((v, i) => i === evtWo4966Idx ? v : null);
 
   if (!chartGapRisco) {
     chartGapRisco = new Chart(document.getElementById('chartGapRisco'), {
       type: 'line',
-      plugins: [ChartDataLabels],
-      data: { labels: mesLabels, datasets: [{ label: 'Gap vencido 90+ − 15 a 90 dias (p.p.)', data: gapRiscoValues, borderColor: '#b23a48', backgroundColor: 'rgba(178,58,72,0.1)', borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: datalabelsConfigPP },
+      plugins: [ChartDataLabels, eventAnnotationPlugin],
+      data: { labels: mesLabels, datasets: [{ label: 'Gap vencido 90+ − 15 a 90 dias (p.p.)', data: gapRiscoValues, borderColor: '#b23a48', backgroundColor: 'rgba(178,58,72,0.1)', borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1 },
+        { ...eventoWo4966Dataset, data: evtWo4966GapSeries }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: datalabelsConfigPP,
+          tooltip: {
+            callbacks: {
+              label: (context) => context.dataset.isAnnotation
+                ? ['Res. CMN 4.966/2021 — vigência 01/01/2025:', 'baixa a prejuízo (write-off) em 540 ou 720 dias,', 'a critério do banco. Explica o salto do vencido', '90+ sem alta correspondente no 15-90 dias.']
+                : `${context.dataset.label}: ${context.formattedValue}`,
+            },
+          },
+        },
         scales: { x: { ticks: { autoSkip: false, font: { size: 10 }, callback: sparseTickCallback }, grid: { display: false } }, y: { title: { display: true, text: 'p.p.' }, grid: { color: '#e1e0d9' } } } }
     });
   } else {
     chartGapRisco.data.labels = mesLabels;
     chartGapRisco.data.datasets[0].data = gapRiscoValues;
+    chartGapRisco.data.datasets[1].data = evtWo4966GapSeries;
     chartGapRisco.update();
   }
   initZoomBrush(chartGapRisco, ensureBrushUI('chartGapRisco'));
