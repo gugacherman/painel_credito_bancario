@@ -456,7 +456,7 @@
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartTaxas"></canvas>
       </div>
-      <p class="caveat"><strong>SGS:</strong> As taxas de juros são as médias das <strong>novas concessões</strong> do mês (séries 20742 e 20744 a 20747), não a taxa do estoque. Por isso não são diretamente comparáveis com os saldos do restante da aba.</p>
+      <p class="caveat"><strong>SGS:</strong> As taxas de juros são as médias ponderadas das <strong>novas concessões</strong> do mês (séries 20742 e 20744 a 20747), não a taxa do estoque. Por isso não são diretamente comparáveis com os saldos do restante da aba.</p>
     </section>
 
     <section>
@@ -680,7 +680,7 @@
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartTaxasCartao"></canvas>
       </div>
-      <p class="caveat"><strong>SGS:</strong> Rotativo (séries 22022/25477) e parcelado (22023/25478): taxa média das <strong>novas concessões</strong> do mês, não do estoque.</p>
+      <p class="caveat"><strong>SGS:</strong> Rotativo (séries 22022/25477) e parcelado (22023/25478): taxa média ponderada das <strong>novas concessões</strong> do mês, não do estoque.</p>
     </section>
 
     <section>
@@ -843,7 +843,7 @@
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartTaxasPessoal"></canvas>
       </div>
-      <p class="caveat"><strong>SGS:</strong> Crédito pessoal não consignado (séries 20742/25464): taxa média das <strong>novas concessões</strong> do mês, não do estoque. Não há série de taxa para cheque especial neste painel.</p>
+      <p class="caveat"><strong>SGS:</strong> Crédito pessoal não consignado (séries 20742/25464): taxa média ponderada das <strong>novas concessões</strong> do mês, não do estoque. Não há série de taxa para cheque especial neste painel.</p>
     </section>
 
     <section>
@@ -858,7 +858,7 @@
         <canvas id="chartInadPessoalPanel"></canvas>
       </div>
       <p style="font-size: 10px; color: var(--text-muted); margin: 6px 0 8px;">Zoom: arraste as alças abaixo do gráfico (vale para os dois painéis) · duplo-clique para resetar.</p>
-      <p class="caveat"><strong>SCR + SGS:</strong> Taxa = média das novas concessões do mês (SGS); inadimplência = sobre o estoque (SCR). São populações diferentes: compare as tendências, não um em função do outro.</p>
+      <p class="caveat"><strong>SCR + SGS:</strong> Taxa = média ponderada das novas concessões do mês (SGS); inadimplência = sobre o estoque (SCR). São populações diferentes: compare as tendências, não um em função do outro.</p>
     </section>
 
     <section>
@@ -948,7 +948,7 @@
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartTaxasVeiculos"></canvas>
       </div>
-      <p class="caveat"><strong>SGS:</strong> Aquisição de veículos PF (séries 20749/25471): taxa média das <strong>novas concessões</strong> do mês, não do estoque.</p>
+      <p class="caveat"><strong>SGS:</strong> Aquisição de veículos PF (séries 20749/25471): taxa média ponderada das <strong>novas concessões</strong> do mês, não do estoque.</p>
     </section>
 
     <section>
@@ -964,7 +964,7 @@
         <canvas id="chartInadVeiculosPanel"></canvas>
       </div>
       <p style="font-size: 10px; color: var(--text-muted); margin: 6px 0 8px;">Zoom: arraste as alças abaixo do gráfico (vale para os dois painéis) · duplo-clique para resetar.</p>
-      <p class="caveat"><strong>SCR + SGS:</strong> Taxa = média das novas concessões do mês (SGS: 20749/25471 PF, 20728/25447 PJ); inadimplência = sobre o estoque (SCR, PF e PJ). São populações diferentes: compare as tendências, não um em função do outro.</p>
+      <p class="caveat"><strong>SCR + SGS:</strong> Taxa = média ponderada das novas concessões do mês (SGS: 20749/25471 PF, 20728/25447 PJ); inadimplência = sobre o estoque (SCR, PF e PJ). São populações diferentes: compare as tendências, não um em função do outro.</p>
     </section>
 
     <section>
@@ -1005,7 +1005,7 @@
         <p class="caveat"><strong>Olinda:</strong> Taxa da última semana de cada mês, desde jan/2025. BTG Pactual, Sicredi e Paccar não estão no ranking semanal de taxas (só têm share).</p>
       </div>
 
-      <p class="caveat"><strong>Olinda + IF.data:</strong> Taxa = média das novas concessões (<span id="labelPeriodoBancosVeiculos"></span>, Olinda). Share = participação na carteira de veículos PF do SFN no trimestre (IF.data). Inclui bancos e financeiras de montadoras (~95% do mercado); Banco Pan está consolidado no BTG.</p>
+      <p class="caveat"><strong>Olinda + IF.data:</strong> Taxa = média ponderada das novas concessões (<span id="labelPeriodoBancosVeiculos"></span>, Olinda). Share = participação na carteira de veículos PF do SFN no trimestre (IF.data). Inclui bancos e financeiras de montadoras (~95% do mercado); Banco Pan está consolidado no BTG.</p>
     </section>
 
     <section>
@@ -1163,7 +1163,7 @@
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartTaxasHabitacional"></canvas>
       </div>
-      <p class="caveat"><strong>SGS:</strong> SFH = taxas reguladas (séries 20773/25498); fora do SFH = taxas de mercado (20772/25497). Taxa média das <strong>novas concessões</strong> do mês, não do estoque.</p>
+      <p class="caveat"><strong>SGS:</strong> SFH = taxas reguladas (séries 20773/25498); fora do SFH = taxas de mercado (20772/25497). Taxa média ponderada das <strong>novas concessões</strong> do mês, não do estoque.</p>
     </section>
 
     <section>
@@ -1287,7 +1287,7 @@
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartTaxasRural"></canvas>
       </div>
-      <p class="caveat"><strong>SGS:</strong> Taxa média das <strong>novas concessões</strong> do crédito rural (regulado e total), PF e PJ. O BC não publica taxa separada por custeio, investimento ou comercialização.</p>
+      <p class="caveat"><strong>SGS:</strong> Taxa média ponderada das <strong>novas concessões</strong> do crédito rural (regulado e total), PF e PJ. O BC não publica taxa separada por custeio, investimento ou comercialização.</p>
     </section>
 
     <section>
