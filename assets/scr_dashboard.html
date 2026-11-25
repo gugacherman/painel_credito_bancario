@@ -4398,6 +4398,15 @@ const B3_MOD_COLORS = { cdc: '#2a78d6', consorcio: '#eda100', leasing: '#2a9d8f'
 let chartB3Modalidade, chartB3ModalidadePizzaA, chartB3ModalidadePizzaB;
 let activoModoB3Modalidade = 'unidades';
 
+// Mostra/esconde as alças de um gráfico (ex.: modo pizza, que é estático e não usa período)
+function setBrushVisivel(canvasId, visivel) {
+  const ids = brushIdsFor(canvasId);
+  const periodo = document.getElementById(ids.periodo);
+  const min = document.getElementById(ids.min);
+  if (periodo && periodo.parentNode) periodo.parentNode.style.display = visivel ? 'flex' : 'none';
+  if (min && min.parentNode) min.parentNode.style.display = visivel ? '' : 'none';
+}
+
 function renderB3Modalidade() {
   const isShare = activoModoB3Modalidade === 'share';
   document.getElementById('wrapB3ModalidadeLinha').style.display = isShare ? 'none' : '';
@@ -4422,6 +4431,8 @@ function renderB3Modalidade() {
     chartB3Modalidade.update();
   };
 
+  // share = pizzas estáticas (dezembro do último ano completo x último mês): sem alças
+  setBrushVisivel('chartB3Modalidade', !isShare);
   if (isShare) {
     renderB3ModalidadePizzas();
     return;
