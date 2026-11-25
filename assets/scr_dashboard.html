@@ -221,7 +221,7 @@
           <tbody id="tableScorecard"></tbody>
         </table>
       </div>
-      <p class="caveat"><strong>SCR + SGS:</strong> Cresc. = variação em 12 meses; Δ inadimplência = variação vs. mês anterior. A cor do Δ indica <strong>direção</strong> (piora/melhora), não nível: os segmentos têm patamares estruturalmente diferentes. Rural = PF + PJ. Consignado, Cartão, Pessoal, Veículos, Habitacional e Rural PF usam o SGS; Grandes, MPMe e Rural PJ usam o SCR.</p>
+      <p class="caveat"><strong>SCR:</strong> Cresc. = variação em 12 meses; Δ inadimplência = variação vs. mês anterior. A cor do Δ indica <strong>direção</strong> (piora/melhora), não nível: os segmentos têm patamares estruturalmente diferentes. Rural = PF + PJ. Todos os segmentos vêm do SCR, para serem comparáveis; os KPIs de cada aba usam o SGS e podem ter nível diferente.</p>
     </section>
 
     <section>
@@ -252,7 +252,7 @@
       <div class="chart-box" style="height: 320px;">
         <canvas id="chartEvolucaoSegmentos"></canvas>
       </div>
-      <p class="caveat"><strong>SCR + SGS:</strong> Independente do filtro Todos/PF/PJ. Consignado, Pessoal, Cartão, Veículos, Habitacional e Rural PF vêm do SGS; Grandes, MPMe e Rural PJ, do SCR. Os segmentos se sobrepõem (ex.: rural PJ também entra em Grandes/MPMe), então não somam um total nacional. Clique na legenda para isolar uma linha.</p>
+      <p class="caveat"><strong>SCR:</strong> Independente do filtro Todos/PF/PJ. Todos os segmentos vêm do SCR, para serem comparáveis (os KPIs de cada aba usam o SGS). Os segmentos se sobrepõem (ex.: rural PJ também entra em Grandes/MPMe), então não somam um total nacional. Clique na legenda para isolar uma linha.</p>
     </section>
 
     <section>
@@ -269,7 +269,7 @@
       <div class="chart-box" style="height: 280px;">
         <canvas id="chartGapRisco"></canvas>
       </div>
-      <p class="caveat"><strong>SCR:</strong> Salto em jan/2025 reflete mudança na regra de write-off (Res. CMN 4.966).</p>
+      <p class="caveat"><strong>SCR:</strong> Salto em jan/2025 reflete a nova regra de write-off (Res. CMN 4.966): os bancos agora podem baixar a prejuízo em 540 ou até 720 dias de atraso, em vez de 360 dias como antes. Com isso, o vencido 90+ fica mais tempo na carteira.</p>
     </section>
 
     <div class="two-col">
@@ -456,9 +456,6 @@
       <div class="chart-box" style="height: 300px;">
         <canvas id="chartTaxas"></canvas>
       </div>
-    </section>
-
-    <section>
       <p class="caveat"><strong>SGS:</strong> As taxas de juros são as médias das <strong>novas concessões</strong> do mês (séries 20742 e 20744 a 20747), não a taxa do estoque. Por isso não são diretamente comparáveis com os saldos do restante da aba.</p>
     </section>
 
@@ -1185,7 +1182,7 @@
         <canvas id="chartInadHabitacional"></canvas>
       </div>
       <p style="font-size: 10px; color: var(--text-muted); margin: 2px 0 8px;">Zoom: arraste as alças abaixo do gráfico · duplo-clique para resetar.</p>
-      <p class="caveat"><strong>SCR + SGS:</strong> Fora do SFH usa o SGS. O SFH não tem série de inadimplência no SGS e segue via SCR.</p>
+      <p class="caveat"><strong>SCR:</strong> As duas séries vêm do SCR, para usar a mesma fonte (o SGS só tem a inadimplência do fora do SFH).</p>
     </section>
 
     <section>
@@ -1571,11 +1568,13 @@ Chart.defaults.layout.padding = { top: 18, right: 0, bottom: 0, left: 0 };
 Chart.register({
   id: 'yAxisTopGrace',
   afterDataLimits(chart, args) {
+    if (chart.$faixasFixas) return; // gráficos com faixas separadas definem os limites sozinhos
     const scale = args.scale;
     if (scale.axis !== 'y' || scale.max == null) return;
     scale.$rawMax = scale.max;
   },
   afterBuildTicks(chart, args) {
+    if (chart.$faixasFixas) return;
     const scale = args.scale;
     if (scale.axis !== 'y' || scale.$rawMax == null || !scale.ticks || !scale.ticks.length) return;
     const ticks = scale.ticks;
@@ -2537,18 +2536,20 @@ function renderConcessoesEstoque() {
   });
 
   const datasets = [
-    { type: 'bar', label: 'Concessões (fluxo bruto)', data: concessoesSerie.map(v => v == null ? null : v / 1e9), backgroundColor: '#2a78d6', borderRadius: 3 },
-    { type: 'bar', label: 'Δ Estoque (crescimento líquido)', data: deltaEstoqueSerie.map(v => v == null ? null : v / 1e9), backgroundColor: '#eda100', borderRadius: 3 },
+    { type: 'bar', label: 'Concessões (fluxo bruto, eixo esq.)', data: concessoesSerie.map(v => v == null ? null : v / 1e9), backgroundColor: '#2a78d6', borderRadius: 3, yAxisID: 'y', order: 1 },
+    { type: 'line', label: 'Δ Estoque (crescimento líquido, eixo dir.)', data: deltaEstoqueSerie.map(v => v == null ? null : v / 1e9), borderColor: '#eda100', backgroundColor: '#eda100', borderWidth: 2, pointRadius: 2, tension: 0.15, yAxisID: 'y1', order: 0 },
   ];
 
   if (!chartConcessoesEstoque) {
     chartConcessoesEstoque = new Chart(document.getElementById('chartConcessoesEstoque'), {
       type: 'bar',
-      plugins: [ChartDataLabels],
+      plugins: [ChartDataLabels, faixasSeparadasPlugin({ baixo: [0, 'y'], cima: [1, 'y1'], baixoZero: true })],
       data: { labels: mesLabels, datasets },
       options: { responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 11 } } }, datalabels: datalabelsConfigBRLbi },
-        scales: { x: { ticks: { autoSkip: false, font: { size: 10 }, callback: sparseTickCallback }, grid: { display: false } }, y: { title: { display: true, text: 'R$ bi/mês' }, grid: { color: '#e1e0d9' } } } }
+        scales: { x: { ticks: { autoSkip: false, font: { size: 10 }, callback: sparseTickCallback }, grid: { display: false } },
+                  y: { position: 'left', title: { display: true, text: 'Concessões (R$ bi/mês)' }, grid: { color: '#e1e0d9' }, ticks: { callback: faixaTick('y') } },
+                  y1: { position: 'right', title: { display: true, text: 'Δ Estoque (R$ bi/mês)' }, grid: { display: false }, ticks: { callback: faixaTick('y1') } } } }
     });
   } else {
     chartConcessoesEstoque.data.labels = mesLabels;
@@ -2617,6 +2618,94 @@ function renderCorrEstoqueTaxa() {
   initZoomBrush(chartCorrEstoqueTaxa, ensureBrushUI('chartCorrEstoqueTaxa'));
 }
 
+// Separa duas séries em faixas verticais distintas (uma embaixo, outra em cima), cada uma no seu
+// eixo, com limites recalculados sobre a janela visível (alças), para as séries não se cruzarem.
+// baixo/cima = [índice do dataset, id do eixo]; baixoZero = eixo de baixo começa em 0 (barras).
+// Limites fixos arredondados (não suggested*), e o plugin global de folga no topo é desligado
+// nesses gráficos ($faixasFixas) -- senão ele soma um degrau e empurra uma faixa sobre a outra.
+function passoRedondo(bruto) {
+  const pot = Math.pow(10, Math.floor(Math.log10(bruto)));
+  for (const m of [1, 2, 2.5, 5, 10]) if (m * pot >= bruto) return m * pot;
+  return 10 * pot;
+}
+function limitesRedondos(lo, hi) {
+  const passo = passoRedondo((hi - lo) / 5);
+  return [Math.floor(lo / passo) * passo, Math.ceil(hi / passo) * passo, passo];
+}
+function faixasSeparadasPlugin({ baixo, cima, baixoZero = false, fracBaixo = 0.45, fracCima = 0.36 }) {
+  // limites de cada faixa a partir da janela visível; calculados no afterDataLimits do próprio
+  // eixo (antes das marcações serem geradas), para marcações e limites ficarem sempre em sincronia
+  const calcular = (chart) => {
+    const [ini, fim] = chart._sparseRange || [0, chart.data.labels.length - 1];
+    const vis = (i) => chart.data.datasets[i].data.slice(ini, fim + 1).filter(v => v != null);
+    const b = vis(baixo[0]), c = vis(cima[0]);
+    if (!b.length || !c.length) return null;
+    const faixa = (arr) => { const mn = Math.min(...arr), mx = Math.max(...arr); return [mn, mx, (mx - mn) || Math.abs(mx) || 1]; };
+    const [bMin, bMax, bR] = faixa(b), [cMin, cMax, cR] = faixa(c);
+    // faixa de baixo: a série ocupa no máximo ~metade da altura, a partir do chão
+    const bLo = baixoZero ? Math.min(0, bMin) : bMin - bR * 0.05;
+    let [b0, b1, bp] = limitesRedondos(bLo, bLo + (bMax - bLo) / fracBaixo);
+    while ((bMax - b0) / (b1 - b0) > 0.50) b1 += bp; // o arredondamento pode subir a série
+    // faixa de cima: no máximo os 40% superiores (sobra >= 10% de folga entre as duas)
+    const cHi = cMax + cR * 0.05;
+    let [c0, c1, cp] = limitesRedondos(cHi - (cHi - cMin) / fracCima, cHi);
+    while ((c1 - cMin) / (c1 - c0) > 0.40) c0 -= cp;
+    // barras (baixoZero) rotulam desde o zero; linhas, só a faixa por onde passam
+    chart._faixas = { [baixo[1]]: [baixoZero ? bLo : bMin, bMax, bR], [cima[1]]: [cMin, cMax, cR] };
+    return { [baixo[1]]: [b0, b1], [cima[1]]: [c0, c1] };
+  };
+  return {
+    id: 'faixasSeparadas',
+    beforeInit(chart) { chart.$faixasFixas = true; },
+    afterDataLimits(chart, args) {
+      const lim = calcular(chart);
+      const l = lim && lim[args.scale.id];
+      if (l) { args.scale.min = l[0]; args.scale.max = l[1]; }
+    },
+  };
+}
+// Dois eixos usando a altura inteira, cada um com a escala natural da sua série (marcações
+// redondas), deslocados em um degrau: o eixo de baixo ganha um degrau no topo (a linha desce) e
+// o de cima ganha um degrau embaixo (a linha sobe). Se ainda se cruzarem na janela visível,
+// soma mais um degrau (até 3).
+function escalasDeslocadasPlugin({ baixo, cima }) {
+  const calcular = (chart) => {
+    const [ini, fim] = chart._sparseRange || [0, chart.data.labels.length - 1];
+    const sb = chart.data.datasets[baixo[0]].data.slice(ini, fim + 1);
+    const sc = chart.data.datasets[cima[0]].data.slice(ini, fim + 1);
+    const b = sb.filter(v => v != null), c = sc.filter(v => v != null);
+    if (!b.length || !c.length) return null;
+    const [b0, b1n, bp] = limitesRedondos(Math.min(...b), Math.max(...b));
+    const [c0n, c1, cp] = limitesRedondos(Math.min(...c), Math.max(...c));
+    let k = 1;
+    for (; k <= 3; k++) {
+      const b1 = b1n + k * bp, c0 = c0n - k * cp;
+      const cruza = sb.some((v, i) => v != null && sc[i] != null && (sc[i] - c0) / (c1 - c0) <= (v - b0) / (b1 - b0));
+      if (!cruza) break;
+    }
+    k = Math.min(k, 3);
+    return { [baixo[1]]: [b0, b1n + k * bp], [cima[1]]: [c0n - k * cp, c1] };
+  };
+  return {
+    id: 'escalasDeslocadas',
+    beforeInit(chart) { chart.$faixasFixas = true; },
+    afterDataLimits(chart, args) {
+      const lim = calcular(chart);
+      const l = lim && lim[args.scale.id];
+      if (l) { args.scale.min = l[0]; args.scale.max = l[1]; }
+    },
+  };
+}
+// rótulo do eixo só na faixa ocupada pela própria série
+function faixaTick(eixo) {
+  return function (value) {
+    const f = this.chart._faixas && this.chart._faixas[eixo];
+    if (!f) return value.toLocaleString('pt-BR');
+    const [mn, mx, r] = f;
+    return (value >= mn - r * 0.3 && value <= mx + r * 0.3) ? value.toLocaleString('pt-BR') : '';
+  };
+}
+
 let chartCorrEstoqueInad;
 function trilDatalabelFormatter(value) {
   return value == null ? '' : 'R$ ' + value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' tri';
@@ -2628,14 +2717,14 @@ function renderCorrEstoqueInad() {
   const inadSerie = mesKeys.map(k => sgsInadValue('geral_total', k));
 
   const datasets = [
-    { label: 'Estoque total (R$ tri)', data: estoqueSerie, yAxisID: 'y', borderColor: '#2a78d6', backgroundColor: 'rgba(42,120,214,0.1)', borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1, datalabels: { formatter: trilDatalabelFormatter } },
-    { label: 'Inadimplência total (%)', data: inadSerie, yAxisID: 'y2', borderColor: '#e34948', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 0, tension: 0.1 },
+    { label: 'Estoque total (R$ tri, eixo esq.)', data: estoqueSerie, yAxisID: 'y', borderColor: '#2a78d6', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1, datalabels: { formatter: trilDatalabelFormatter } },
+    { label: 'Inadimplência total (%, eixo dir.)', data: inadSerie, yAxisID: 'y2', borderColor: '#e34948', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 0, tension: 0.1 },
   ];
 
   if (!chartCorrEstoqueInad) {
     chartCorrEstoqueInad = new Chart(document.getElementById('chartCorrEstoqueInad'), {
       type: 'line',
-      plugins: [ChartDataLabels],
+      plugins: [ChartDataLabels, escalasDeslocadasPlugin({ baixo: [0, 'y'], cima: [1, 'y2'] })],
       data: { labels: mesLabels, datasets },
       options: { responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 11 } } }, datalabels: datalabelsConfig },
@@ -2721,20 +2810,18 @@ function sgsSaldoSum(keys, k) {
 }
 // Cores na ordem categórica fixa do painel (slot 1→7, nunca ciclada/gerada) --
 // ver :root no <head>. Antes usava tons ad hoc (#d85a30, #3d3d3d) fora da paleta.
-// Cada segmento tenta SGS primeiro (fonte oficial), cai pro SCR se a serie nao cobrir o mes
-// (ex.: Grande/MPME, sem serie SGS por porte; ver mesma regra usada nas abas individuais).
+// Todos os segmentos via SCR: é a única fonte que cobre todos (Grandes/MPMe não existem no SGS),
+// e misturar SGS com SCR no mesmo gráfico deixaria os níveis incomparáveis entre si.
 const SEGMENTOS_EVOLUCAO = [
-  { label: 'Consignado', color: '#2a78d6', getTotal: (k) => sgsSaldoValue('consignado_total', k) ?? genericMonthTotal(DATA_CONSIGNADO.by_month_ocupacao, k) },
-  { label: 'Crédito pessoal e cartão', color: '#1baf7a', getTotal: (k) => sgsSaldoSum(['cartao_total_pf', 'pessoal_nao_consignado_pf', 'cheque_especial_pf'], k) ?? genericMonthTotal(DATA_RISCO.by_month_bucket, k) },
-  { label: 'Veículos', color: '#eda100', getTotal: (k) => sgsSaldoValue('veiculos_pf', k) ?? genericMonthTotal(DATA_VEICULOS.by_month_bucket, k) },
-  { label: 'Habitacional', color: '#008300', getTotal: (k) => sgsSaldoValue('habitacional_total_pf', k) ?? genericMonthTotal(DATA_HABITACIONAL.by_month_bucket, k) },
+  { label: 'Consignado', color: '#2a78d6', getTotal: (k) => genericMonthTotal(DATA_CONSIGNADO.by_month_ocupacao, k) },
+  { label: 'Crédito pessoal e cartão', color: '#1baf7a', getTotal: (k) => genericMonthTotal(DATA_RISCO.by_month_bucket, k) },
+  { label: 'Veículos', color: '#eda100', getTotal: (k) => genericMonthTotal(DATA_VEICULOS.by_month_bucket, k) },
+  { label: 'Habitacional', color: '#008300', getTotal: (k) => genericMonthTotal(DATA_HABITACIONAL.by_month_bucket, k) },
   {
     label: 'Rural (PF + PJ)', color: '#4a3aa7', getTotal: (k) => {
-      const pf = sgsSaldoValue('rural_pf_total', k) ?? genericMonthTotal(DATA_RURAL.by_month_bucket, k);
+      const pf = genericMonthTotal(DATA_RURAL.by_month_bucket, k);
       const pj = genericMonthTotal(DATA_RURAL_PJ.by_month_bucket, k);
       if (pf == null && pj == null) return null;
-      // meses so do SGS (alem do SCR): sem a parte PJ, o total ficaria subestimado
-      if (pj == null && ym(k) > ym(DATA.latest_month || Object.keys(DATA.month_cliente).sort().pop())) return null;
       return (pf || 0) + (pj || 0);
     }
   },
@@ -2743,7 +2830,7 @@ const SEGMENTOS_EVOLUCAO = [
 ];
 
 function renderEvolucaoSegmentos() {
-  const mesKeys = comMesesSgs(Object.keys(DATA.month_cliente).sort());
+  const mesKeys = Object.keys(DATA.month_cliente).sort(); // só meses do SCR (fonte única do gráfico)
   const mesLabels = mesKeys.map(mesLabel);
 
   document.getElementById('legendEvolucaoSegmentos').innerHTML = SEGMENTOS_EVOLUCAO.map((s, i) => {
@@ -3229,28 +3316,26 @@ function sgsTotalsCombo(saldoKeys, inadKeys, k) {
 const SEGMENTOS_SCORECARD = [
   { tab: 'consignado', label: 'Consignado', color: '#2a78d6', cliente: 'pf',
     byMonth: () => DATA_CONSIGNADO.by_month_ocupacao,
-    getTotals: (bm, k) => sgsTotals('consignado_total', 'consignado_total', k) || genericMonthTotals(bm, k) },
+    getTotals: (bm, k) => genericMonthTotals(bm, k) },
   { tab: 'cartao', label: 'Cartão de crédito', color: '#1baf7a', cliente: 'pf',
     byMonth: () => DATA_RISCO.by_month_bucket,
-    getTotals: (bm, k) => sgsTotals('cartao_total_pf', 'cartao_total_pf', k) || genericMonthTotalsSubset(bm, k, CARTAO_KEYS.map(kk => CARTAO_BUCKET_MAP[kk])) },
+    getTotals: (bm, k) => genericMonthTotalsSubset(bm, k, CARTAO_KEYS.map(kk => CARTAO_BUCKET_MAP[kk])) },
   { tab: 'pessoal', label: 'Crédito pessoal', color: '#eda100', cliente: 'pf',
     byMonth: () => DATA_RISCO.by_month_bucket,
-    getTotals: (bm, k) => sgsTotals('pessoal_nao_consignado_pf', 'pessoal_nao_consignado_pf', k) || genericMonthTotalsSubset(bm, k, PESSOAL_KEYS.map(kk => PESSOAL_BUCKET_MAP[kk])) },
+    getTotals: (bm, k) => genericMonthTotalsSubset(bm, k, PESSOAL_KEYS.map(kk => PESSOAL_BUCKET_MAP[kk])) },
   { tab: 'veiculos', label: 'Veículos', color: '#008300', cliente: 'pf',
     byMonth: () => DATA_VEICULOS.by_month_bucket,
-    getTotals: (bm, k) => sgsTotals('veiculos_pf', 'veiculos_pf', k) || genericMonthTotals(bm, k) },
+    getTotals: (bm, k) => genericMonthTotals(bm, k) },
   { tab: 'habitacional', label: 'Habitacional', color: '#4a3aa7', cliente: 'pf',
     byMonth: () => DATA_HABITACIONAL.by_month_bucket,
-    getTotals: (bm, k) => sgsTotals('habitacional_total_pf', 'habitacional_total_pf', k) || genericMonthTotals(bm, k) },
+    getTotals: (bm, k) => genericMonthTotals(bm, k) },
   // Único segmento com PF e PJ em fontes separadas (DATA_RURAL = PF, DATA_RURAL_PJ = PJ) --
   // byMonth/getTotals leem activeCliente em tempo de render pra somar só a população certa.
-  // SGS so cobre a parte PF (rural_pf_total) -- PJ nao tem serie SGS viva, continua via SCR;
-  // a visao "Todos" combina SGS-PF + SCR-PJ (mistura de fonte inevitavel nesse segmento).
+  // Tudo via SCR (mesma fonte dos demais segmentos do painel).
   { tab: 'rural', label: 'Rural (PF + PJ)', color: '#e34948', cliente: 'both',
     byMonth: () => activeCliente === 'PJ' ? DATA_RURAL_PJ.by_month_bucket : DATA_RURAL.by_month_bucket,
     getTotals: (bm, k) => {
-      const pfSgs = sgsTotals('rural_pf_total', 'rural_pf_total', k);
-      const pf = pfSgs || genericMonthTotals(DATA_RURAL.by_month_bucket, k);
+      const pf = genericMonthTotals(DATA_RURAL.by_month_bucket, k);
       if (activeCliente === 'PF') return pf;
       if (activeCliente === 'PJ') return genericMonthTotals(DATA_RURAL_PJ.by_month_bucket, k);
       const pj = genericMonthTotals(DATA_RURAL_PJ.by_month_bucket, k);
@@ -3290,7 +3375,8 @@ function scorecardDeltaPill(delta) {
   return `<span class="delta-pill ${cls}"><span class="arrow">▲</span>${fmtPP(delta)}</span>`;
 }
 
-const SCORECARD_TABS_SO_SGS = ['consignado', 'cartao', 'pessoal', 'veiculos', 'habitacional'];
+// Painel 100% SCR: nenhum segmento anda com o calendário do SGS
+const SCORECARD_TABS_SO_SGS = [];
 function renderScorecard() {
   // Filtro Todos/PF/PJ do topo (activeCliente) também restringe as linhas do painel:
   // Consignado/Cartão/Crédito pessoal/Veículos/Habitacional só existem para pessoa física;
@@ -3306,7 +3392,7 @@ function renderScorecard() {
     let keys = Object.keys(byMonth).sort();
     // Segmentos 100% SGS andam com o SGS (que sai ~1 mes antes); Grande/MPME (so SCR) e
     // Rural com parte PJ (SCR) ficam no ultimo mes do SCR.
-    const soSgs = SCORECARD_TABS_SO_SGS.includes(seg.tab) || (seg.tab === 'rural' && activeCliente === 'PF');
+    const soSgs = SCORECARD_TABS_SO_SGS.includes(seg.tab);
     if (soSgs) {
       const ext = comMesesSgs(keys);
       if (ext.length > keys.length && seg.getTotals(byMonth, ext[ext.length - 1])) keys = ext;
@@ -3822,8 +3908,9 @@ function renderCresPessoal() {
   const cresDatasets = PESSOAL_KEYS.map((key) => {
     const bucket = PESSOAL_BUCKET_MAP[key];
     const sgsKey = PESSOAL_KEY_TO_SGS_SALDO[key];
+    // uma fonte só por gráfico: as duas séries têm SGS, então não cai para o SCR mês a mês
     const raw = mesKeysR.map(k => {
-      if (sgsKey) { const v = sgsSaldoValue(sgsKey, k); if (v != null) return v; }
+      if (sgsKey) return sgsSaldoValue(sgsKey, k);
       const row = DATA_RISCO.by_month_bucket[k];
       return row && row[bucket] ? row[bucket][1] : null;
     });
@@ -4363,7 +4450,9 @@ const HABITACIONAL_KEYS = Object.keys(HABITACIONAL_BUCKET_MAP);
 // Ambos tem serie SGS de saldo (regulada/mercado); so' "mercado" tem serie SGS de
 // inadimplencia propria -- SFH (regulado) nao tem quebra oficial, fica no SCR nesse eixo.
 const HABITACIONAL_KEY_TO_SGS_SALDO = { sfh: 'habitacional_sfh_pf', fora_sfh: 'habitacional_mercado_pf' };
-const HABITACIONAL_KEY_TO_SGS_INAD = { fora_sfh: 'habitacional_mercado_pf' };
+// vazio de propósito: o SGS só tem a inadimplência do fora do SFH; para não misturar fontes no
+// mesmo gráfico, as duas séries de inadimplência vêm do SCR
+const HABITACIONAL_KEY_TO_SGS_INAD = {};
 
 function renderHabitacional() {
   const latest = DATA_HABITACIONAL.latest_month;
@@ -4493,8 +4582,9 @@ function renderCresHabitacional() {
   const cresDatasets = HABITACIONAL_KEYS.map((key) => {
     const bucket = HABITACIONAL_BUCKET_MAP[key];
     const sgsKey = HABITACIONAL_KEY_TO_SGS_SALDO[key];
+    // uma fonte só por gráfico: SFH e fora do SFH têm SGS, então não cai para o SCR mês a mês
     const raw = mesKeysH.map(k => {
-      if (sgsKey) { const v = sgsSaldoValue(sgsKey, k); if (v != null) return v; }
+      if (sgsKey) return sgsSaldoValue(sgsKey, k);
       const row = DATA_HABITACIONAL.by_month_bucket[k];
       return row && row[bucket] ? row[bucket][1] : null;
     });
